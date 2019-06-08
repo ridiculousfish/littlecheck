@@ -2,6 +2,8 @@
 
 """ Command line test driver. """
 
+from __future__ import unicode_literals
+
 import argparse
 import io
 import re
@@ -216,25 +218,26 @@ class TestRun(object):
             return None
 
     def run(self):
+        def split_by_newlines(s):
+            """ Decode a string and split it by newlines only,
+                retaining the newlines.
+            """
+            return [s + "\n" for s in s.decode("utf-8").split("\n")]
+
         PIPE = subprocess.PIPE
         if self.config.verbose:
             print(self.subbed_command)
         proc = subprocess.Popen(
-            self.subbed_command,
-            stdin=PIPE,
-            stdout=PIPE,
-            stderr=PIPE,
-            shell=True,
-            universal_newlines=True,
+            self.subbed_command, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True
         )
         stdout, stderr = proc.communicate()
         outlines = [
             Line(text, idx + 1, "stdout")
-            for idx, text in enumerate(stdout.splitlines(True))
+            for idx, text in enumerate(split_by_newlines(stdout))
         ]
         errlines = [
             Line(text, idx + 1, "stderr")
-            for idx, text in enumerate(stderr.splitlines(True))
+            for idx, text in enumerate(split_by_newlines(stderr))
         ]
         failure = self.check(outlines, self.checker.outchecks)
         if not failure:
@@ -279,6 +282,7 @@ class CheckCmd(object):
                 except re.error:
                     raise CheckerError("Invalid regular expression: '%s'" % piece, line)
                 re_strings.append(piece)
+            even = not even
         # Enclose each piece in a non-capturing group.
         # This ensures that lower-precedence operators don't trip up catenation.
         # For example: {{b|c}}d would result in /b|cd/ which is different.

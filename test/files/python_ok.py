@@ -7,7 +7,7 @@ import sys
 print("abc")
 # CHECK: abc
 
-print("%x"%(16**3))
+print("%x" % (16 ** 3))
 # CHECK: 1000
 
 for i in range(3):
@@ -16,3 +16,5 @@ for i in range(3):
 # CHECK: 1
 # CHECK: 2
 
+print(str(3 ** 64))
+# CHECK: {{\d+}}
