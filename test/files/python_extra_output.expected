@@ -1,3 +1,5 @@
 Failure in python_extra_output.py:
 Extra output after checks:
   Output line stdout:2: Second
+When running command:
+  /usr/bin/python python_extra_output.py

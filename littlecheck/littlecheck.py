@@ -2,6 +2,7 @@
 
 """ Command line test driver. """
 
+import argparse
 import io
 import re
 import shlex
@@ -115,6 +116,7 @@ class TestFailure(object):
     def message(self):
         fields = self.testrun.config.colors()
         fields["name"] = self.testrun.name
+        fields["subbed_command"] = self.testrun.subbed_command
         if self.line:
             fields.update(
                 {
@@ -135,18 +137,19 @@ class TestFailure(object):
         if self.line and self.check:
             fmtstr += (
                 "  Output line {output_file}:{output_lineno}: {output_line}\n"
-                + "  failed to match line {input_lineno}: {input_line}"
+                + "  failed to match line {input_lineno}: {input_line}\n"
             )
         elif self.check:
             fmtstr += (
                 "Missing output for check:\n"
-                + "  {input_file}:{input_lineno}: {input_line}"
+                + "  {input_file}:{input_lineno}: {input_line}\n"
             )
         else:
             fmtstr += (
                 "Extra output after checks:\n"
                 + "  Output line {output_file}:{output_lineno}: {output_line}\n"
             )
+        fmtstr += "When running command:\n  {subbed_command}"
         return fmtstr.format(**fields)
 
     def print_message(self):
@@ -154,22 +157,34 @@ class TestFailure(object):
         print(self.message())
 
 
+def perform_substitution(input_str, subs):
+    """ Perform the substitutions described by subs to str
+        Return the substituted string.
+    """
+    # Sort our substitutions into a list of tuples (key, value), descending by length.
+    # It needs to be descending because we need to try longer substitutions first.
+    subs_ordered = sorted(subs.items(), key=lambda s: len(s[0]), reverse=True)
+
+    def subber(m):
+        # We get the entire sequence of characters.
+        # Replace just the prefix and return it.
+        text = m.group(1)
+        for key, replacement in subs_ordered:
+            if text.startswith(key):
+                return replacement + text[len(key) :]
+        raise CheckerError("Unknown substitution: " + m.group(0))
+
+    return re.sub(r"%(%|[a-zA-Z0-9_-]+)", subber, input_str)
+
+
 class TestRun(object):
     def __init__(self, name, runcmd, checker, subs, config):
         self.name = name
         self.runcmd = runcmd
+        self.subbed_command = perform_substitution(runcmd.args, subs)
         self.checker = checker
         self.subs = subs
         self.config = config
-
-    def substitute(self, arg):
-        def subber(m):
-            text = m.group(1)
-            if text not in self.subs:
-                raise CheckerError("Unknown substitution", self.runcmd.line)
-            return self.subs[text]
-
-        return re.sub(r"%({.*?}|.)", subber, arg)
 
     def check(self, lines, checks):
         # Reverse our lines and checks so we can pop off the end.
@@ -201,12 +216,11 @@ class TestRun(object):
             return None
 
     def run(self):
-        subbed_args = self.substitute(self.runcmd.args)
         PIPE = subprocess.PIPE
         if self.config.verbose:
-            print(subbed_args)
+            print(self.subbed_command)
         proc = subprocess.Popen(
-            subbed_args,
+            self.subbed_command,
             stdin=PIPE,
             stdout=PIPE,
             stderr=PIPE,
@@ -317,12 +331,56 @@ def check_path(path, subs, config, failure_handler):
         return check_file(fd, path, subs, config, failure_handler)
 
 
+def parse_subs(subs):
+    """ Given a list of input substitutions like 'foo=bar',
+       return a dictionary like {foo:bar}, or exit if invalid.
+    """
+    result = {}
+    for sub in subs:
+        try:
+            key, val = sub.split("=", 1)
+            if not key:
+                print("Invalid substitution %s: empty key" % sub)
+                sys.exit(1)
+            if not val:
+                print("Invalid substitution %s: empty value" % sub)
+                sys.exit(1)
+            result[key] = val
+        except ValueError:
+            print("Invalid substitution %s: equal sign not found" % sub)
+            sys.exit(1)
+    return result
+
+
+def get_argparse():
+    """ Return a littlecheck argument parser. """
+    parser = argparse.ArgumentParser(
+        description="littlecheck: command line tool tester."
+    )
+    parser.add_argument(
+        "-s",
+        "--substitute",
+        type=str,
+        help="Add a new substitution for RUN lines. Example: bash=/bin/bash",
+        action="append",
+        default=[],
+    )
+    parser.add_argument("file", nargs="+", help="File to check")
+    return parser
+
+
 def main():
+    args = get_argparse().parse_args()
+    # Default substitution is %% -> %
+    def_subs = {"%": "%"}
+    def_subs.update(parse_subs(args.substitute))
+
     success = True
     config = Config()
     config.colorize = sys.stdout.isatty()
-    for path in sys.argv[1:]:
-        subs = {"%": "%", "s": path}
+    for path in args.file:
+        subs = def_subs.copy()
+        subs["s"] = path
         if not check_path(path, subs, config, TestFailure.print_message):
             success = False
     sys.exit(0 if success else 1)

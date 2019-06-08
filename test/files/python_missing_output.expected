@@ -1,3 +1,5 @@
 Failure in python_missing_output.py:
 Missing output for check:
   python_missing_output.py:8: NotPrinted
+When running command:
+  /usr/bin/python python_missing_output.py
