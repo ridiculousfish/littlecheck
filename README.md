@@ -2,7 +2,7 @@
 
 littlecheck is a tool for testing command line tools. It is heavily inspired by the [lit](http://llvm.org/docs/CommandGuide/lit.html) and [FileCheck](https://www.llvm.org/docs/CommandGuide/FileCheck.html) combo. littlecheck is much simpler, and has no dependencies except Python (2.7 or 3).
 
-littlecheck is aimed at programs which process a text file and produce output on stdout and/or stderr. A test file is processed by littlecheck, which parses out special directives embedded in comments. The same file is processed by the tool under test, which ignores the comments. littlecheck then verifies the tool's output according to the directives.
+littlecheck is aimed at programs which process a text file and produce output on stdout and/or stderr. A test file is processed by littlecheck, which reads special directives embedded in comments. The same file is processed by the tool under test, which ignores the comments. littlecheck then verifies the tool's output according to the directives.
 
 # Basic Example
 
@@ -63,6 +63,7 @@ Run `make test` to run the tests.
 - littlecheck currently only supports `#` comments. Other commenting styles would be straightforward to add.
 - littlecheck does not yet support the rich set of substitutions of `lit`, only `%s` and `%%`.
 - littlecheck does not support the `CHECK` and `CHECK-NEXT` distinction. All lines are expected to be present, except that empty output lines are ignored.
+- littlecheck permits leading whitespace on matching lines and does not yet support something like the `--strict-whitespace` option to FileCheck.
 
 # License
 
