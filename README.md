@@ -1,6 +1,6 @@
 # littlecheck - command line tool tester
 
-littlecheck is a tool for testing command line tools. It is heavily inspired by the [lit](http://llvm.org/docs/CommandGuide/lit.html) and [FileCheck](https://www.llvm.org/docs/CommandGuide/FileCheck.html) combo. littlecheck is much simpler, and has no dependencies except Python (2.7 or 3).
+littlecheck is a tool for testing command line tools. It is heavily inspired by the [lit](http://llvm.org/docs/CommandGuide/lit.html) and [FileCheck](https://www.llvm.org/docs/CommandGuide/FileCheck.html) combo. littlecheck is much simpler: it requires only one Python file and has no dependencies except for Python itself (2.7 or 3).
 
 littlecheck is aimed at programs which process a text file and produce output on stdout and/or stderr. A test file is processed by littlecheck, which reads special directives embedded in comments. The same file is processed by the tool under test, which ignores the comments. littlecheck then verifies the tool's output according to the directives.
 
@@ -53,6 +53,10 @@ $stderr.puts "this goes to stderr"
 # CHECK: this goes to stdout
 # CHECKERR: this goes to stderr
 ```
+
+# Integrating littlecheck
+
+To integrate littlecheck into your project, simply copy the file `littlecheck/littlecheck.py` into the appropriate place in your source tree. No other files are required.
 
 # Tests
 
