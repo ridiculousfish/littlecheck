@@ -61,7 +61,7 @@ Run `make test` to run the tests.
 # Limitations
 
 - littlecheck currently only supports `#` comments. Other commenting styles would be straightforward to add.
-- littlecheck does not yet support the rich set of substitutions of `lit`, only `%s` and `%%`.
+- littlecheck does not yet support all substitutions of `lit`. It supports `%s` and `%%`, and custom ones via the `-s` option.
 - littlecheck does not support the `CHECK` and `CHECK-NEXT` distinction. All lines are expected to be present, except that empty output lines are ignored.
 - littlecheck permits leading whitespace on matching lines and does not yet support something like the `--strict-whitespace` option to FileCheck.
 
