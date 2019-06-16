@@ -42,3 +42,6 @@ class LittlecheckTest(unittest.TestCase):
 
     def test_py_extra_output(self):
         self.do_1_path_test("python_extra_output")
+
+    def test_py_out_vs_err(self):
+        self.do_1_path_test("python_out_vs_err")

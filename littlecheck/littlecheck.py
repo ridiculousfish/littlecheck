@@ -114,11 +114,14 @@ class TestFailure(object):
         self.line = line
         self.check = check
         self.testrun = testrun
+        self.error_annotation = None
 
     def message(self):
         fields = self.testrun.config.colors()
         fields["name"] = self.testrun.name
         fields["subbed_command"] = self.testrun.subbed_command
+        if self.error_annotation:
+            fields["error_annotation"] = self.error_annotation
         if self.line:
             fields.update(
                 {
@@ -151,6 +154,8 @@ class TestFailure(object):
                 "Extra output after checks:\n"
                 + "  Output line {output_file}:{output_lineno}: {output_line}\n"
             )
+        if self.error_annotation:
+            fmtstr += "Additional stderr output: {error_annotation}"
         fmtstr += "When running command:\n  {subbed_command}"
         return fmtstr.format(**fields)
 
@@ -218,6 +223,8 @@ class TestRun(object):
             return None
 
     def run(self):
+        """ Run the command. Return a TestFailure, or None. """
+
         def split_by_newlines(s):
             """ Decode a string and split it by newlines only,
                 retaining the newlines.
@@ -239,10 +246,15 @@ class TestRun(object):
             Line(text, idx + 1, "stderr")
             for idx, text in enumerate(split_by_newlines(stderr))
         ]
-        failure = self.check(outlines, self.checker.outchecks)
-        if not failure:
-            failure = self.check(errlines, self.checker.errchecks)
-        return failure
+        outfail = self.check(outlines, self.checker.outchecks)
+        errfail = self.check(errlines, self.checker.errchecks)
+        # It's possible that something going wrong on stdout resulted in new
+        # text being printed on stderr. If we have an outfailure, and either
+        # non-matching or unmatched stderr text, then annotate the outfail
+        # with it.
+        if outfail and errfail and errfail.line:
+            outfail.error_annotation = errfail.line.text
+        return outfail if outfail else errfail
 
 
 class CheckCmd(object):
