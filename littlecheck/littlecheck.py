@@ -35,6 +35,8 @@ class Config(object):
             return "\033[%dm" % n if self.colorize else ""
 
         return {
+            "RESET": ansic(0),
+            "BOLD": ansic(1),
             "NORMAL": ansic(39),
             "BLACK": ansic(30),
             "RED": ansic(31),
@@ -114,14 +116,12 @@ class TestFailure(object):
         self.line = line
         self.check = check
         self.testrun = testrun
-        self.error_annotation = None
+        self.error_annotation_line = None
 
     def message(self):
         fields = self.testrun.config.colors()
         fields["name"] = self.testrun.name
         fields["subbed_command"] = self.testrun.subbed_command
-        if self.error_annotation:
-            fields["error_annotation"] = self.error_annotation
         if self.line:
             fields.update(
                 {
@@ -136,28 +136,43 @@ class TestFailure(object):
                     "input_file": self.check.line.file,
                     "input_lineno": self.check.line.number,
                     "input_line": self.check.line.text,
+                    "check_type": self.check.type,
                 }
             )
-        fmtstr = "{RED}Failure in {name}:{NORMAL}\n"
+        fmtstrs = ["{RED}Failure{RESET} in {name}:", ""]
         if self.line and self.check:
-            fmtstr += (
-                "  Output line {output_file}:{output_lineno}: {output_line}\n"
-                + "  failed to match line {input_lineno}: {input_line}\n"
-            )
+            fmtstrs += [
+                "  The {check_type} on line {input_lineno} wants:",
+                "    {BOLD}{input_line}{RESET}",
+                "",
+                "  which failed to match line {output_file}:{output_lineno}:",
+                "    {BOLD}{output_line}{RESET}",
+                "",
+            ]
+
         elif self.check:
-            fmtstr += (
-                "Missing output for check:\n"
-                + "  {input_file}:{input_lineno}: {input_line}\n"
-            )
+            fmtstrs += [
+                "  The {check_type} on line {input_lineno} wants:",
+                "    {BOLD}{input_line}{RESET}",
+                "",
+                "  but there was no remaining output to match.",
+                "",
+            ]
         else:
-            fmtstr += (
-                "Extra output after checks:\n"
-                + "  Output line {output_file}:{output_lineno}: {output_line}\n"
-            )
-        if self.error_annotation:
-            fmtstr += "Additional stderr output: {error_annotation}"
-        fmtstr += "When running command:\n  {subbed_command}"
-        return fmtstr.format(**fields)
+            fmtstrs += [
+                "  There were no remaining checks left to match {output_file}:{output_lineno}:",
+                "    {BOLD}{output_line}{RESET}",
+                "",
+            ]
+        if self.error_annotation_line:
+            fields["error_annotation"] = self.error_annotation_line.text
+            fields["error_annotation_lineno"] = self.error_annotation_line.number
+            fmtstrs += [
+                "  additional output on stderr:{error_annotation_lineno}:",
+                "    {BOLD}{error_annotation}{RESET}",
+            ]
+        fmtstrs += ["  when running command:", "    {subbed_command}"]
+        return "\n".join(fmtstrs).format(**fields)
 
     def print_message(self):
         """ Print our message to stdout. """
@@ -253,17 +268,18 @@ class TestRun(object):
         # non-matching or unmatched stderr text, then annotate the outfail
         # with it.
         if outfail and errfail and errfail.line:
-            outfail.error_annotation = errfail.line.text
+            outfail.error_annotation_line = errfail.line
         return outfail if outfail else errfail
 
 
 class CheckCmd(object):
-    def __init__(self, line, regex):
+    def __init__(self, line, checktype, regex):
         self.line = line
+        self.type = checktype
         self.regex = regex
 
     @staticmethod
-    def parse(line):
+    def parse(line, checktype):
         # type: (Line) -> CheckCmd
         # Everything inside {{}} is a regular expression.
         # Everything outside of it is a literal string.
@@ -306,7 +322,7 @@ class CheckCmd(object):
         # not the entire string.
         re_strings = [r"^\s*"] + re_strings + [r"\s*\n?$"]
         full_re = re.compile("".join(re_strings))
-        return CheckCmd(line, full_re)
+        return CheckCmd(line, checktype, full_re)
 
 
 class Checker(object):
@@ -325,8 +341,12 @@ class Checker(object):
             raise CheckerError("No runlines ('# RUN') found")
 
         # Find check cmds.
-        self.outchecks = [CheckCmd.parse(sl) for sl in group1s(CHECK_STDOUT_RE)]
-        self.errchecks = [CheckCmd.parse(sl) for sl in group1s(CHECK_STDERR_RE)]
+        self.outchecks = [
+            CheckCmd.parse(sl, "CHECK") for sl in group1s(CHECK_STDOUT_RE)
+        ]
+        self.errchecks = [
+            CheckCmd.parse(sl, "CHECKERR") for sl in group1s(CHECK_STDERR_RE)
+        ]
 
 
 def check_file(input_file, name, subs, config, failure_handler):

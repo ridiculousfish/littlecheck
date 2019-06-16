@@ -1,5 +1,7 @@
 Failure in python_extra_output.py:
-Extra output after checks:
-  Output line stdout:2: Second
-When running command:
-  /usr/bin/python python_extra_output.py
+
+  There were no remaining checks left to match stdout:2:
+    Second
+
+  when running command:
+    /usr/bin/python python_extra_output.py

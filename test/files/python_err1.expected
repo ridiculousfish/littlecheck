@@ -1,5 +1,10 @@
 Failure in python_err1.py:
-  Output line stderr:1: ALPHA
-  failed to match line 6: BETA
-When running command:
-  /usr/bin/python python_err1.py
+
+  The CHECKERR on line 6 wants:
+    BETA
+
+  which failed to match line stderr:1:
+    ALPHA
+
+  when running command:
+    /usr/bin/python python_err1.py

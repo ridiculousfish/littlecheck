@@ -1,6 +1,13 @@
 Failure in python_out_vs_err.py:
-  Output line stdout:2: now stdout is broken
-  failed to match line 17: things should be cool
-Additional stderr output: something failed
-When running command:
-  /usr/bin/python python_out_vs_err.py
+
+  The CHECK on line 17 wants:
+    things should be cool
+
+  which failed to match line stdout:2:
+    now stdout is broken
+
+  additional output on stderr:1:
+    something failed
+
+  when running command:
+    /usr/bin/python python_out_vs_err.py
