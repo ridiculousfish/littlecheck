@@ -347,7 +347,12 @@ class Checker(object):
         # Find run commands.
         self.runcmds = [RunCmd.parse(sl) for sl in group1s(RUN_RE)]
         if not self.runcmds:
-            raise CheckerError("No runlines ('# RUN') found")
+            # If no RUN command has been given, fall back to the shebang.
+            if lines[0].text.startswith("#!"):
+                # Remove the "#!" at the beginning, and the newline at the end.
+                self.runcmds = [RunCmd(lines[0].text[2:-1] + " %s", lines[0])]
+            else:
+                raise CheckerError("No runlines ('# RUN') found")
 
         # Find check cmds.
         self.outchecks = [
