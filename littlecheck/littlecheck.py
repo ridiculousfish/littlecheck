@@ -255,6 +255,14 @@ class TestRun(object):
             self.subbed_command, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True
         )
         stdout, stderr = proc.communicate()
+        # HACK: This is quite cheesy: POSIX specifies that sh should return 127 for a missing command.
+        # Technically it's also possible to return it in other conditions.
+        # Practically, that's *probably* not going to happen.
+        status = proc.returncode
+        if status == 127:
+            print("Command could not be found: ", self.subbed_command)
+            return None
+
         outlines = [
             Line(text, idx + 1, "stdout")
             for idx, text in enumerate(split_by_newlines(stdout))
