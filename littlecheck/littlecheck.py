@@ -139,7 +139,8 @@ class TestFailure(object):
                     "check_type": self.check.type,
                 }
             )
-        fmtstrs = ["{RED}Failure{RESET} in {name}:", ""]
+        filemsg = "" if self.testrun.config.progress else " in {name}"
+        fmtstrs = ["{RED}Failure{RESET}" + filemsg + ":", ""]
         if self.line and self.check:
             fmtstrs += [
                 "  The {check_type} on line {input_lineno} wants:",
@@ -420,6 +421,14 @@ def get_argparse():
         action="append",
         default=[],
     )
+    parser.add_argument(
+        "-p",
+        "--progress",
+        action='store_true',
+        dest='progress',
+        help="Show the files to be checked",
+        default=False,
+    )
     parser.add_argument("file", nargs="+", help="File to check")
     return parser
 
@@ -433,12 +442,20 @@ def main():
     success = True
     config = Config()
     config.colorize = sys.stdout.isatty()
+    config.progress = args.progress
+    fields = config.colors()
     for path in args.file:
+        fields["path"] = path
+        if config.progress:
+            print("Testing file {path} ... ".format(**fields), end='')
         subs = def_subs.copy()
         subs["s"] = path
         if not check_path(path, subs, config, TestFailure.print_message):
             success = False
-    sys.exit(0 if success else 1)
+            print("")
+        else:
+            print("{GREEN}ok".format(**fields))
+        sys.exit(0 if success else 1)
 
 
 if __name__ == "__main__":
