@@ -260,8 +260,7 @@ class TestRun(object):
         # Practically, that's *probably* not going to happen.
         status = proc.returncode
         if status == 127:
-            print("Command could not be found: ", self.subbed_command)
-            return None
+            raise CheckerError("Command could not be found: " + self.subbed_command)
 
         outlines = [
             Line(text, idx + 1, "stdout")
