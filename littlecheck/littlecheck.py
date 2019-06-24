@@ -194,7 +194,9 @@ def perform_substitution(input_str, subs):
         for key, replacement in subs_ordered:
             if text.startswith(key):
                 return replacement + text[len(key) :]
-        raise CheckerError("Unknown substitution: " + m.group(0))
+        # No substitution found, so we default to running it as-is,
+        # which will end up running it via $PATH.
+        return text
 
     return re.sub(r"%(%|[a-zA-Z0-9_-]+)", subber, input_str)
 
