@@ -4,6 +4,10 @@ littlecheck is a tool for testing command line tools. It is heavily inspired by 
 
 littlecheck is aimed at programs which process a text file and produce output on stdout and/or stderr. A test file is processed by littlecheck, which reads special directives embedded in comments. The same file is processed by the tool under test, which ignores the comments. littlecheck then verifies the tool's output according to the directives.
 
+# Screenshot
+
+![littlecheck-failure](screenshots/demo1.png)
+
 # Basic Example
 
 An example test for the Python interpreter:
