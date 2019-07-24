@@ -19,6 +19,6 @@ for i in range(3):
 print(str(3 ** 64))
 # CHECK: {{\d+}}
 
-if true:
+if True:
     print("indented")
     # CHECK: indented
