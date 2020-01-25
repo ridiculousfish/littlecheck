@@ -45,3 +45,9 @@ class LittlecheckTest(unittest.TestCase):
 
     def test_py_out_vs_err(self):
         self.do_1_path_test("python_out_vs_err")
+
+    def test_py_path(self):
+        self.do_1_path_test("python_path_cmd")
+
+    def test_py_shebang(self):
+        self.do_1_path_test("python_shebang")

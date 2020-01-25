@@ -194,7 +194,9 @@ def perform_substitution(input_str, subs):
         for key, replacement in subs_ordered:
             if text.startswith(key):
                 return replacement + text[len(key) :]
-        raise CheckerError("Unknown substitution: " + m.group(0))
+        # No substitution found, so we default to running it as-is,
+        # which will end up running it via $PATH.
+        return text
 
     return re.sub(r"%(%|[a-zA-Z0-9_-]+)", subber, input_str)
 
@@ -258,6 +260,13 @@ class TestRun(object):
             close_fds=True,  # For Python 2.6 as shipped on RHEL 6
         )
         stdout, stderr = proc.communicate()
+        # HACK: This is quite cheesy: POSIX specifies that sh should return 127 for a missing command.
+        # Technically it's also possible to return it in other conditions.
+        # Practically, that's *probably* not going to happen.
+        status = proc.returncode
+        if status == 127:
+            raise CheckerError("Command could not be found: " + self.subbed_command)
+
         outlines = [
             Line(text, idx + 1, "stdout")
             for idx, text in enumerate(split_by_newlines(stdout))
@@ -343,7 +352,12 @@ class Checker(object):
         # Find run commands.
         self.runcmds = [RunCmd.parse(sl) for sl in group1s(RUN_RE)]
         if not self.runcmds:
-            raise CheckerError("No runlines ('# RUN') found")
+            # If no RUN command has been given, fall back to the shebang.
+            if lines[0].text.startswith("#!"):
+                # Remove the "#!" at the beginning, and the newline at the end.
+                self.runcmds = [RunCmd(lines[0].text[2:-1] + " %s", lines[0])]
+            else:
+                raise CheckerError("No runlines ('# RUN') found")
 
         # Find check cmds.
         self.outchecks = [
