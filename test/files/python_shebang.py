@@ -1,2 +1,4 @@
 #!/usr/bin/python
-print("weeeee")
+import sys
+sys.stderr.write("weeeee\n")
+# CHECKERR: weeeee
