@@ -27,6 +27,8 @@ class Config(object):
         self.verbose = False
         # Whether output gets ANSI colorization.
         self.colorize = False
+        # Whether to show which file was tested.
+        self.progress = False
         # How many after lines to print
         self.after = 5
 
