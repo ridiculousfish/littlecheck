@@ -27,6 +27,8 @@ class Config(object):
         self.verbose = False
         # Whether output gets ANSI colorization.
         self.colorize = False
+        # How many after lines to print
+        self.after = 5
 
     def colors(self):
         """ Return a dictionary mapping color names to ANSI escapes """
@@ -112,13 +114,16 @@ class RunCmd(object):
 
 
 class TestFailure(object):
-    def __init__(self, line, check, testrun):
+    def __init__(self, line, check, testrun, after = None):
         self.line = line
         self.check = check
         self.testrun = testrun
         self.error_annotation_line = None
+        # The output that comes *after* the failure.
+        self.after = after
 
     def message(self):
+        afterlines = self.testrun.config.after
         fields = self.testrun.config.colors()
         fields["name"] = self.testrun.name
         fields["subbed_command"] = self.testrun.subbed_command
@@ -172,6 +177,12 @@ class TestFailure(object):
                 "  additional output on stderr:{error_annotation_lineno}:",
                 "    {BOLD}{error_annotation}{RESET}",
             ]
+        if self.after:
+            fields["additional_output"] = "    ".join(self.after[:afterlines])
+            fmtstrs += [
+                "  additional output:",
+                "    {BOLD}{additional_output}{RESET}",
+                ]
         fmtstrs += ["  when running command:", "    {subbed_command}"]
         return "\n".join(fmtstrs).format(**fields)
 
@@ -227,7 +238,9 @@ class TestRun(object):
                 lineq.pop()
             else:
                 # Failed to match.
-                return TestFailure(line, check, self)
+                lineq.pop()
+                # Add context, ignoring empty lines.
+                return TestFailure(line, check, self, after = [line.text for line in lineq[::-1] if not line.is_empty_space()])
         # Drain empties.
         while lineq and lineq[-1].is_empty_space():
             lineq.pop()
@@ -430,6 +443,13 @@ def get_argparse():
         default=False,
     )
     parser.add_argument("file", nargs="+", help="File to check")
+    parser.add_argument(
+        "-A", "--after",
+        type=int,
+        help="How many non-empty lines of output after a failure to print (default: 5)",
+        action="store",
+        default=5,
+    )
     return parser
 
 
@@ -444,6 +464,7 @@ def main():
     config.colorize = sys.stdout.isatty()
     config.progress = args.progress
     fields = config.colors()
+    config.after = args.after
     for path in args.file:
         fields["path"] = path
         if config.progress:

@@ -6,5 +6,12 @@ Failure in python_err1.py:
   which failed to match line stderr:1:
     ALPHA
 
+  additional output:
+    GAMMA1
+    GAMMA2
+    GAMMA3
+    GAMMA4
+    GAMMA5
+
   when running command:
     /usr/bin/python python_err1.py
