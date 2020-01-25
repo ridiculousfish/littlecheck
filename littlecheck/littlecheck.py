@@ -477,7 +477,7 @@ def main():
             success = False
         elif config.progress:
             print("{GREEN}ok{RESET}".format(**fields))
-        sys.exit(0 if success else 1)
+    sys.exit(0 if success else 1)
 
 
 if __name__ == "__main__":
