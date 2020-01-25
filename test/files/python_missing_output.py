@@ -6,4 +6,3 @@ print("First")
 # CHECK: First
 
 # CHECK: NotPrinted
-
