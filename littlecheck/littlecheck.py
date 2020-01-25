@@ -475,9 +475,8 @@ def main():
         subs["s"] = path
         if not check_path(path, subs, config, TestFailure.print_message):
             success = False
-            print("")
-        else:
-            print("{GREEN}ok".format(**fields))
+        elif config.progress:
+            print("{GREEN}ok{RESET}".format(**fields))
         sys.exit(0 if success else 1)
 
 
