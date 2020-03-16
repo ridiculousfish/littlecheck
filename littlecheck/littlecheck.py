@@ -468,7 +468,7 @@ def main():
     def_subs = {"%": "%"}
     def_subs.update(parse_subs(args.substitute))
 
-    success = True
+    failure_count = 0
     config = Config()
     config.colorize = sys.stdout.isatty()
     config.progress = args.progress
@@ -483,7 +483,7 @@ def main():
         subs["s"] = path
         starttime = datetime.datetime.now()
         if not check_path(path, subs, config, TestFailure.print_message):
-            success = False
+            failure_count += 1
         elif config.progress:
             endtime = datetime.datetime.now()
             duration_ms = round((endtime - starttime).total_seconds() * 1000)
@@ -492,7 +492,7 @@ def main():
                     duration=duration_ms, **fields
                 )
             )
-    sys.exit(0 if success else 1)
+    sys.exit(failure_count)
 
 
 if __name__ == "__main__":
