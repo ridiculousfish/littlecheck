@@ -188,7 +188,7 @@ class TestFailure(object):
         if self.before:
             fields["before_output"] = "    ".join(self.before)
             fields["additional_output"] = "    ".join(self.after[:afterlines])
-            fmtstrs += [" Context:",
+            fmtstrs += ["  Context:",
                         "    {BOLD}{before_output}    {RED}{output_line}{RESET} <= does not match '{LIGHTBLUE}{input_line}{RESET}'",
                         "    {BOLD}{additional_output}{RESET}"]
         elif self.after:
