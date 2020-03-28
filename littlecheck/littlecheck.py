@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import argparse
+from collections import deque
 import datetime
 import io
 import re
@@ -118,13 +119,14 @@ class RunCmd(object):
 
 
 class TestFailure(object):
-    def __init__(self, line, check, testrun, after=None):
+    def __init__(self, line, check, testrun, before=None, after=None):
         self.line = line
         self.check = check
         self.testrun = testrun
         self.error_annotation_line = None
         # The output that comes *after* the failure.
         self.after = after
+        self.before = before
 
     def message(self):
         afterlines = self.testrun.config.after
@@ -181,7 +183,13 @@ class TestFailure(object):
                 "  additional output on stderr:{error_annotation_lineno}:",
                 "    {BOLD}{error_annotation}{RESET}",
             ]
-        if self.after:
+        if self.before:
+            fields["before_output"] = "    ".join(self.before)
+            fields["additional_output"] = "    ".join(self.after[:afterlines])
+            fmtstrs += [" Context:",
+                        "    {BOLD}{before_output}    {RED}{output_line}{RESET} <= does not match '{LIGHTBLUE}{input_line}{RESET}'",
+                        "    {BOLD}{additional_output}{RESET}"]
+        elif self.after:
             fields["additional_output"] = "    ".join(self.after[:afterlines])
             fmtstrs += ["  additional output:", "    {BOLD}{additional_output}{RESET}"]
         fmtstrs += ["  when running command:", "    {subbed_command}"]
@@ -227,6 +235,9 @@ class TestRun(object):
         # Reverse our lines and checks so we can pop off the end.
         lineq = lines[::-1]
         checkq = checks[::-1]
+        # We keep the last couple of lines in a deque so we can show context.
+        # For now the maximum length is not configurable.
+        before = deque(maxlen=5)
         while lineq and checkq:
             line = lineq[-1]
             check = checkq[-1]
@@ -234,6 +245,7 @@ class TestRun(object):
                 # This line matched this checker, continue on.
                 lineq.pop()
                 checkq.pop()
+                before.append(line.text)
             elif line.is_empty_space():
                 # Skip all whitespace input lines.
                 lineq.pop()
@@ -245,6 +257,7 @@ class TestRun(object):
                     line,
                     check,
                     self,
+                    before=before,
                     after=[
                         line.text for line in lineq[::-1] if not line.is_empty_space()
                     ],

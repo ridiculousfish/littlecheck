@@ -37,6 +37,9 @@ class LittlecheckTest(unittest.TestCase):
     def test_py_err1(self):
         self.do_1_path_test("python_err1")
 
+    def test_py_middle_error(self):
+        self.do_1_path_test("python_middle_error")
+
     def test_py_missing_output(self):
         self.do_1_path_test("python_missing_output")
 
