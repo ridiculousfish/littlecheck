@@ -34,6 +34,8 @@ class Config(object):
         self.progress = False
         # How many after lines to print
         self.after = 5
+        # How many before lines to print
+        self.before = 5
 
     def colors(self):
         """ Return a dictionary mapping color names to ANSI escapes """
@@ -236,8 +238,7 @@ class TestRun(object):
         lineq = lines[::-1]
         checkq = checks[::-1]
         # We keep the last couple of lines in a deque so we can show context.
-        # For now the maximum length is not configurable.
-        before = deque(maxlen=5)
+        before = deque(maxlen = self.config.before)
         while lineq and checkq:
             line = lineq[-1]
             check = checkq[-1]
@@ -472,6 +473,14 @@ def get_argparse():
         action="store",
         default=5,
     )
+    parser.add_argument(
+        "-B",
+        "--before",
+        type=int,
+        help="How many non-empty lines of output before a failure to print (default: 5)",
+        action="store",
+        default=5,
+    )
     return parser
 
 
@@ -487,6 +496,10 @@ def main():
     config.progress = args.progress
     fields = config.colors()
     config.after = args.after
+    config.before = args.before
+    if config.before < 0:
+        raise ValueError("Before must be at least 0")
+
     for path in args.file:
         fields["path"] = path
         if config.progress:
