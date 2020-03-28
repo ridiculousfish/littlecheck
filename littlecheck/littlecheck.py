@@ -499,6 +499,8 @@ def main():
     config.before = args.before
     if config.before < 0:
         raise ValueError("Before must be at least 0")
+    if config.after < 0:
+        raise ValueError("After must be at least 0")
 
     for path in args.file:
         fields["path"] = path
