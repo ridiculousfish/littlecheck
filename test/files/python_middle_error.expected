@@ -1,0 +1,20 @@
+Failure in python_middle_error.py:
+
+  The CHECKERR on line 10 wants:
+    BETA
+
+  which failed to match line stderr:3:
+    GAMMA3
+
+  Context:
+    GAMMA1
+    GAMMA2
+    GAMMA3 <= does not match 'BETA'
+    GAMMA4
+    GAMMA5
+    GAMMA6
+    GAMMA7
+    GAMMA8
+
+  when running command:
+    /usr/bin/python python_middle_error.py

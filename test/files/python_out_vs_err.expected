@@ -9,5 +9,9 @@ Failure in python_out_vs_err.py:
   additional output on stderr:1:
     something failed
 
+  Context:
+    fine so far
+    now stdout is broken <= does not match 'things should be cool'
+    
   when running command:
     /usr/bin/python python_out_vs_err.py
