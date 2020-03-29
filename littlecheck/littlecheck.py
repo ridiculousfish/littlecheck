@@ -188,9 +188,11 @@ class TestFailure(object):
         if self.before:
             fields["before_output"] = "    ".join(self.before)
             fields["additional_output"] = "    ".join(self.after[:afterlines])
-            fmtstrs += ["  Context:",
-                        "    {BOLD}{before_output}    {RED}{output_line}{RESET} <= does not match '{LIGHTBLUE}{input_line}{RESET}'",
-                        "    {BOLD}{additional_output}{RESET}"]
+            fmtstrs += [
+                "  Context:",
+                "    {BOLD}{before_output}    {RED}{output_line}{RESET} <= does not match '{LIGHTBLUE}{input_line}{RESET}'",
+                "    {BOLD}{additional_output}{RESET}",
+            ]
         elif self.after:
             fields["additional_output"] = "    ".join(self.after[:afterlines])
             fmtstrs += ["  additional output:", "    {BOLD}{additional_output}{RESET}"]
@@ -238,7 +240,7 @@ class TestRun(object):
         lineq = lines[::-1]
         checkq = checks[::-1]
         # We keep the last couple of lines in a deque so we can show context.
-        before = deque(maxlen = self.config.before)
+        before = deque(maxlen=self.config.before)
         while lineq and checkq:
             line = lineq[-1]
             check = checkq[-1]
