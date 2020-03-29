@@ -6,7 +6,7 @@ Failure in python_middle_error.py:
   which failed to match line stderr:3:
     GAMMA3
 
- Context:
+  Context:
     GAMMA1
     GAMMA2
     GAMMA3 <= does not match 'BETA'
