@@ -1,0 +1,10 @@
+Failure in python_color.py:
+
+  The CHECK on line 4 wants:
+    banana
+
+  which failed to match line stdout:1:
+    \x1b[33mFOO
+
+  when running command:
+    /usr/bin/python python_color.py

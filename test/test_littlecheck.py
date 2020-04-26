@@ -54,3 +54,6 @@ class LittlecheckTest(unittest.TestCase):
 
     def test_py_shebang(self):
         self.do_1_path_test("python_shebang")
+
+    def test_py_color(self):
+        self.do_1_path_test("python_color")
