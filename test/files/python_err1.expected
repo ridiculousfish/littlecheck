@@ -6,7 +6,8 @@ Failure in python_err1.py:
   which failed to match line stderr:1:
     ALPHA
 
-  additional output:
+  Context:
+    ALPHA <= does not match 'BETA'
     GAMMA1
     GAMMA2
     GAMMA3
