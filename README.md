@@ -7,6 +7,8 @@ littlecheck is aimed at programs which process a text file and produce output on
 # Screenshot
 
 ![littlecheck-failure](screenshots/demo1.png)
+![littlecheck-success](screenshots/demo2.png)
+![littlecheck-context](screenshots/demo3.png)
 
 # Basic Example
 
