@@ -216,21 +216,20 @@ class TestFailure(object):
                 "  additional output on stderr:{error_annotation_lineno}:",
                 "    {BOLD}{error_annotation}{RESET}",
             ]
-        if self.before:
-            fields["before_output"] = "    ".join(self.before)
-            fields["additional_output"] = "    ".join(self.after[:afterlines])
+        if self.before or self.after:
+            fmtstrs += ["  Context:"]
+
+            if self.before:
+                fields["before_output"] = "    ".join(self.before)[:-1]
+                fmtstrs += ["    {BOLD}{before_output}"]
+
             fmtstrs += [
-                "  Context:",
-                "    {BOLD}{before_output}    {RED}{output_line}{RESET} <= does not match '{LIGHTBLUE}{input_line}{RESET}'",
-                "    {BOLD}{additional_output}{RESET}",
-            ]
-        elif self.after:
-            fields["additional_output"] = "    ".join(self.after[:afterlines])
-            fmtstrs += [
-                "  Context:",
                 "    {RED}{output_line}{RESET} <= does not match '{LIGHTBLUE}{input_line}{RESET}'",
-                "    {BOLD}{additional_output}{RESET}"
             ]
+
+            if self.after is not None:
+                fields["additional_output"] = "    ".join(self.after[:afterlines])
+                fmtstrs += ["    {BOLD}{additional_output}{RESET}"]
         fmtstrs += ["  when running command:", "    {subbed_command}"]
         return "\n".join(fmtstrs).format(**fields)
 
