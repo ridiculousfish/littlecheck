@@ -57,3 +57,7 @@ class LittlecheckTest(unittest.TestCase):
 
     def test_py_color(self):
         self.do_1_path_test("python_color")
+
+    def test_inline_check(self):
+        self.do_1_path_test("inline-check")
+

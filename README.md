@@ -17,11 +17,9 @@ An example test for the Python interpreter:
 ```python
 # RUN: /usr/bin/python %s
 
-print("abc")
-# CHECK: abc
+print("abc") # CHECK: abc
 
-print("%x"%(16**3))
-# CHECK: 1000
+print("%x"%(16**3)) # CHECK: 1000
 
 for i in range(3):
     print(i)
@@ -40,6 +38,8 @@ littlecheck will parse out the special comments `# RUN` and `# CHECK`:
 - `# CHECK` specifies an expected output line. littlecheck verifies that the output of the shell command matches the sequence of `CHECK` lines.
 
 If no `# RUN` command has been given, littlecheck will use a given shebang.
+
+The special comments can occur at the beginning of a line, or anywhere in a line that does not start with `#`.
 
 # Advanced Usage
 

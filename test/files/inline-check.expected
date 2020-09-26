@@ -1,0 +1,15 @@
+Failure in inline-check.py:
+
+  The CHECK on line 12 wants:
+    match
+
+  which failed to match line stdout:2:
+    mismatch
+
+  Context:
+    ok
+    mismatch <= does not match 'match'
+    
+  when running command:
+    /bin/sh inline-check.py
+
