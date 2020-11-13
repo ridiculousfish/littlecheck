@@ -1,0 +1,20 @@
+Failure in python_multipe_error_annotation_lines.py:
+
+  The CHECK on line 24 wants:
+    things should be cool
+
+  which failed to match line stdout:2:
+    something failed
+
+  additional output on stderr:3:5:
+    stderr3
+    stderr4
+    stderr5
+
+  Context:
+    fine so far
+    something failed <= does not match 'things should be cool'
+    now stdout is broken
+
+  when running command:
+    /usr/bin/python python_multipe_error_annotation_lines.py

@@ -43,6 +43,9 @@ class LittlecheckTest(unittest.TestCase):
     def test_py_missing_output(self):
         self.do_1_path_test("python_missing_output")
 
+    def test_py_multiple_errour_output(self):
+        self.do_1_path_test("python_multipe_error_annotation_lines")
+
     def test_py_extra_output(self):
         self.do_1_path_test("python_extra_output")
 

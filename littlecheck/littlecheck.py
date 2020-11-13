@@ -156,7 +156,7 @@ class TestFailure(object):
         self.line = line
         self.check = check
         self.testrun = testrun
-        self.error_annotation_line = None
+        self.error_annotation_lines = None
         # The output that comes *after* the failure.
         self.after = after
         self.before = before
@@ -209,9 +209,11 @@ class TestFailure(object):
                 "    {BOLD}{output_line}{RESET}",
                 "",
             ]
-        if self.error_annotation_line:
-            fields["error_annotation"] = self.error_annotation_line.text
-            fields["error_annotation_lineno"] = self.error_annotation_line.number
+        if self.error_annotation_lines:
+            fields["error_annotation"] = "    ".join([x.text for x in self.error_annotation_lines])
+            fields["error_annotation_lineno"] = str(self.error_annotation_lines[0].number)
+            if len(self.error_annotation_lines) > 1:
+                fields["error_annotation_lineno"] += ":" + str(self.error_annotation_lines[-1].number)
             fmtstrs += [
                 "  additional output on stderr:{error_annotation_lineno}:",
                 "    {BOLD}{error_annotation}{RESET}",
@@ -357,7 +359,10 @@ class TestRun(object):
         # non-matching or unmatched stderr text, then annotate the outfail
         # with it.
         if outfail and errfail and errfail.line:
-            outfail.error_annotation_line = errfail.line
+            outfail.error_annotation_lines = errlines[errfail.line.number - 1:]
+            # Trim a trailing newline
+            if outfail.error_annotation_lines[-1].text == "\n":
+                del outfail.error_annotation_lines[-1]
         return outfail if outfail else errfail
 
 
