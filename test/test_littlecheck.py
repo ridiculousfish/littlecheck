@@ -64,3 +64,5 @@ class LittlecheckTest(unittest.TestCase):
     def test_inline_check(self):
         self.do_1_path_test("inline-check")
 
+    def test_py_whitespace(self):
+        self.do_1_path_test("python_whitespace")
