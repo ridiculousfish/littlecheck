@@ -1,20 +1,5 @@
 Failure in python_whitespace.py:
 
-  The CHECK on line 11 wants:
-    {{^}} three
-
-  which failed to match line stdout:3:
-    three
-
-  Context:
-    one
-    two
-    three <= does not match '{{^}} three'
-    
-  when running command:
-    /usr/bin/python python_whitespace.py
-Failure in python_whitespace.py:
-
   The CHECK on line 14 wants:
     {{^}} four
 
