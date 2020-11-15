@@ -13,6 +13,8 @@ import re
 import shlex
 import subprocess
 import sys
+from itertools import zip_longest
+from difflib import SequenceMatcher
 
 # Directives can occur at the beginning of a line, or anywhere in a line that does not start with #.
 COMMENT_RE = r'^(?:[^#].*)?#\s*'
@@ -151,11 +153,16 @@ class RunCmd(object):
 
 
 class TestFailure(object):
-    def __init__(self, line, check, testrun):
+    def __init__(self, line, check, testrun, diff=None, text1=[], text2=[], lines=[], checks=[]):
         self.line = line
         self.check = check
         self.testrun = testrun
         self.error_annotation_lines = None
+        self.diff = diff
+        self.text1 = text1
+        self.text2 = text2
+        self.lines = lines
+        self.checks = checks
 
     def message(self):
         fields = self.testrun.config.colors()
@@ -213,6 +220,38 @@ class TestFailure(object):
                 "  additional output on stderr:{error_annotation_lineno}:",
                 "    {BOLD}{error_annotation}{RESET}",
             ]
+        if self.diff:
+            fmtstrs += ["  Context:"]
+            lasthi = 0
+            for d in self.diff.get_grouped_opcodes():
+                for op, alo, ahi, blo, bhi in d:
+                    color="{BOLD}"
+                    if op == 'replace' or op == 'delete':
+                        color="{RED}"
+                    # We got a new chunk, so we print a marker.
+                    if alo > lasthi:
+                        fmtstrs += [
+                            "    [...] from line " + str(self.checks[blo].line.number)
+                            + " " + self.lines[alo].file + ":" + str(self.lines[alo].number)
+                        ]
+                    lasthi = ahi
+
+                    for a, b in zip_longest(self.text1[alo:ahi], self.text2[blo:bhi]):
+                        # Clean up strings for use in a format string - double up the curlies.
+                        astr = color + a.replace("{", "{{").replace("}", "}}") + "{RESET}" if a else ""
+                        if b: b = b.replace("{", "{{").replace("}", "}}")
+
+                        if op == 'equal':
+                            fmtstrs += ["    " + astr]
+                        elif b and a:
+                            fmtstrs += ["    " + astr + " <= does not match '{BLUE}" + b + "{RESET}'"]
+                        elif b:
+                            fmtstrs += ["    " + astr + " <= nothing to match '{BLUE}" + b + "{RESET}'"]
+                        elif not b:
+                            string = "    " + astr
+                            string += " (nothing to match)"
+                            fmtstrs.append(string)
+            fmtstrs.append("")
         fmtstrs += ["  when running command:", "    {subbed_command}"]
         return "\n".join(fmtstrs).format(**fields)
 
@@ -256,36 +295,60 @@ class TestRun(object):
         # Reverse our lines and checks so we can pop off the end.
         lineq = lines[::-1]
         checkq = checks[::-1]
+        usedlines = []
+        usedchecks = []
+        text1 = []
+        text2 = []
+        mismatches = []
         while lineq and checkq:
             line = lineq[-1]
             check = checkq[-1]
             if check.regex.match(line.text):
                 # This line matched this checker, continue on.
+                text1.append(line.escaped_text())
+                usedlines.append(line)
+                text2.append(line.escaped_text())
+                usedchecks.append(check)
                 lineq.pop()
                 checkq.pop()
             elif line.is_empty_space():
                 # Skip all whitespace input lines.
                 lineq.pop()
             else:
+                text1.append(line.escaped_text())
+                usedlines.append(line)
+                text2.append(check.line.escaped_text())
+                usedchecks.append(check)
+                mismatches.append((line, check))
                 # Failed to match.
                 lineq.pop()
-                line.text = line.escaped_text() + "\n"
-                # Add context, ignoring empty lines.
-                return TestFailure(
-                    line,
-                    check,
-                    self,
-                )
-        # Drain empties.
+                checkq.pop()
+
+        # Drain empties
         while lineq and lineq[-1].is_empty_space():
             lineq.pop()
-        # If there's still lines or checkers, we have a failure.
+
+        # Store the remaining lines for the diff
+        for i in lineq[::-1]:
+            if not i.is_empty_space():
+                text1.append(i.escaped_text())
+                usedlines.append(i)
+        # Store remaining checks for the diff
+        for i in checkq[::-1]:
+            text2.append(i.line.escaped_text())
+
+        # Do a SequenceMatch! This gives us a diff-like thing.
+        diff = SequenceMatcher(a=text1, b=text2)
+        # If there's a mismatch or still lines or checkers, we have a failure.
         # Otherwise it's success.
-        if lineq:
-            return TestFailure(lineq[-1], None, self)
+        if mismatches:
+            return TestFailure(mismatches[0][0], mismatches[0][1], self, diff=diff, text1=text1, text2=text2, lines=usedlines, checks=usedchecks)
+        elif lineq:
+            return TestFailure(lineq[-1], None, self, diff=diff, text1=text1, text2=text2, lines=usedlines, checks=usedchecks)
         elif checkq:
-            return TestFailure(None, checkq[-1], self)
+            return TestFailure(None, checkq[-1], self, diff=diff, text1=text1, text2=text2, lines=usedlines, checks=usedchecks)
         else:
+            # Success!
             return None
 
     def run(self):
