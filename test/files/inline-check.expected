@@ -8,8 +8,7 @@ Failure in inline-check.py:
 
   Context:
     ok
-    mismatch <= does not match 'match'
-    
+    mismatch <= does not match CHECK 'match' on line 12
+
   when running command:
     /bin/sh inline-check.py
-

@@ -1,13 +1,14 @@
-Failure in python_err1.py:
+Failure in python_missing_check.py:
 
-  The CHECKERR on line 6 wants:
+  The CHECKERR on line 7 wants:
     BETA
 
   which failed to match line stderr:1:
     ALPHA
 
   Context:
-    ALPHA <= does not match CHECKERR 'BETA' on line 6
+    ALPHA <= no check matches
+    BETA
     GAMMA1 <= no more checks
     GAMMA2
     GAMMA3
@@ -18,4 +19,4 @@ Failure in python_err1.py:
     GAMMA8
 
   when running command:
-    /usr/bin/python python_err1.py
+    /usr/bin/python python_missing_check.py

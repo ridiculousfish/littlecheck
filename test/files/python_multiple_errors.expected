@@ -1,0 +1,16 @@
+Failure in python_multiple_errors.py:
+
+  The CHECK on line 7 wants:
+    eins
+
+  which failed to match line stdout:2:
+    one
+
+  Context:
+    foo
+    one <= does not match CHECK 'eins' on line 7
+    two <= does not match CHECK 'zwei' on line 9
+    bar
+
+  when running command:
+    /usr/bin/python python_multiple_errors.py

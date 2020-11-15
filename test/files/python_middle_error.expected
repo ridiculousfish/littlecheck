@@ -9,12 +9,10 @@ Failure in python_middle_error.py:
   Context:
     GAMMA1
     GAMMA2
-    GAMMA3 <= does not match 'BETA'
+    GAMMA3 <= does not match CHECKERR 'BETA' on line 10
     GAMMA4
     GAMMA5
     GAMMA6
-    GAMMA7
-    GAMMA8
 
   when running command:
     /usr/bin/python python_middle_error.py

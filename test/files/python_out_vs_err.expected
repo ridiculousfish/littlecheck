@@ -11,7 +11,7 @@ Failure in python_out_vs_err.py:
 
   Context:
     fine so far
-    now stdout is broken <= does not match 'things should be cool'
-    
+    now stdout is broken <= does not match CHECK 'things should be cool' on line 17
+
   when running command:
     /usr/bin/python python_out_vs_err.py

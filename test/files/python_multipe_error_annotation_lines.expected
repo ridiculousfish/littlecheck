@@ -13,8 +13,8 @@ Failure in python_multipe_error_annotation_lines.py:
 
   Context:
     fine so far
-    something failed <= does not match 'things should be cool'
-    now stdout is broken
+    something failed <= does not match CHECK 'things should be cool' on line 24
+    now stdout is broken <= no more checks
 
   when running command:
     /usr/bin/python python_multipe_error_annotation_lines.py

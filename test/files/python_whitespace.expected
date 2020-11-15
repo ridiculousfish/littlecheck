@@ -4,13 +4,13 @@ Failure in python_whitespace.py:
     {{^}} four
 
   which failed to match line stdout:4:
-    four
+       four
 
   Context:
-    one
-    two
+        one
+        two
     three
-    four <= does not match '{{^}} four'
-    
+       four <= does not match CHECK '{{^}} four' on line 14
+
   when running command:
     /usr/bin/python python_whitespace.py
