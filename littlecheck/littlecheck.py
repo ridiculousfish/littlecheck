@@ -13,7 +13,10 @@ import re
 import shlex
 import subprocess
 import sys
-from itertools import zip_longest
+try:
+    from itertools import zip_longest
+except ImportError:
+    from itertools import izip_longest as zip_longest
 from difflib import SequenceMatcher
 
 # Directives can occur at the beginning of a line, or anywhere in a line that does not start with #.
