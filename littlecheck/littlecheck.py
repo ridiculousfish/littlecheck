@@ -132,6 +132,9 @@ class Line(object):
     def is_empty_space(self):
         return not self.text or self.text.isspace()
 
+    def escaped_text(self):
+        return escape_string(self.text.rstrip("\n"))
+
 
 class RunCmd(object):
     """ A command to run on a given Checker.
@@ -171,7 +174,7 @@ class TestFailure(object):
                 {
                     "output_file": self.line.file,
                     "output_lineno": self.line.number,
-                    "output_line": self.line.text.rstrip("\n"),
+                    "output_line": self.line.escaped_text(),
                 }
             )
         if self.check:
@@ -179,7 +182,7 @@ class TestFailure(object):
                 {
                     "input_file": self.check.line.file,
                     "input_lineno": self.check.line.number,
-                    "input_line": self.check.line.text,
+                    "input_line": self.check.line.escaped_text(),
                     "check_type": self.check.type,
                 }
             )
@@ -291,15 +294,15 @@ class TestRun(object):
             else:
                 # Failed to match.
                 lineq.pop()
-                line.text = escape_string(line.text.strip()) + "\n"
+                line.text = line.escaped_text() + "\n"
                 # Add context, ignoring empty lines.
                 return TestFailure(
                     line,
                     check,
                     self,
-                    before=[escape_string(line.text.strip()) + "\n" for line in before],
+                    before=[line.escaped_text() + "\n" for line in before],
                     after=[
-                        escape_string(line.text.strip()) + "\n"
+                        line.escaped_text() + "\n"
                         for line in lineq[::-1]
                         if not line.is_empty_space()
                     ],
