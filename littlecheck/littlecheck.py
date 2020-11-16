@@ -133,9 +133,11 @@ class Line(object):
     def is_empty_space(self):
         return not self.text or self.text.isspace()
 
-    def escaped_text(self):
-        return escape_string(self.text.rstrip("\n"))
-
+    def escaped_text(self, for_formatting=False):
+        ret = escape_string(self.text.rstrip("\n"))
+        if for_formatting:
+            ret = ret.replace("{", "{{").replace("}", "}}")
+        return ret
 
 class RunCmd(object):
     """ A command to run on a given Checker.
@@ -239,8 +241,8 @@ class TestFailure(object):
 
                     for a, b in zip_longest(self.lines[alo:ahi], self.checks[blo:bhi]):
                         # Clean up strings for use in a format string - double up the curlies.
-                        astr = color + a.escaped_text().replace("{", "{{").replace("}", "}}") + "{RESET}" if a else ""
-                        if b: bstr = "'{BLUE}" + b.line.escaped_text().replace("{", "{{").replace("}", "}}") + "{RESET}'" + " on line " + str(b.line.number)
+                        astr = color + a.escaped_text(for_formatting=True) + "{RESET}" if a else ""
+                        if b: bstr = "'{BLUE}" + b.line.escaped_text(for_formatting=True) + "{RESET}'" + " on line " + str(b.line.number)
 
                         if op == 'equal':
                             fmtstrs += ["    " + astr]
