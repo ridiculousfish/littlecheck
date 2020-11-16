@@ -1,0 +1,22 @@
+Failure in python_missing_check.py:
+
+  The CHECKERR on line 7 wants:
+    BETA
+
+  which failed to match line stderr:1:
+    ALPHA
+
+  Context:
+    ALPHA (nothing to match)
+    BETA
+    GAMMA1 (nothing to match)
+    GAMMA2 (nothing to match)
+    GAMMA3 (nothing to match)
+    GAMMA4 (nothing to match)
+    GAMMA5 (nothing to match)
+    GAMMA6 (nothing to match)
+    GAMMA7 (nothing to match)
+    GAMMA8 (nothing to match)
+
+  when running command:
+    /usr/bin/python python_missing_check.py
