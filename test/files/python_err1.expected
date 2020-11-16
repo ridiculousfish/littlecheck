@@ -8,11 +8,14 @@ Failure in python_err1.py:
 
   Context:
     ALPHA <= does not match 'BETA'
-    GAMMA1
-    GAMMA2
-    GAMMA3
-    GAMMA4
-    GAMMA5
+    GAMMA1 (nothing to match)
+    GAMMA2 (nothing to match)
+    GAMMA3 (nothing to match)
+    GAMMA4 (nothing to match)
+    GAMMA5 (nothing to match)
+    GAMMA6 (nothing to match)
+    GAMMA7 (nothing to match)
+    GAMMA8 (nothing to match)
 
   when running command:
     /usr/bin/python python_err1.py

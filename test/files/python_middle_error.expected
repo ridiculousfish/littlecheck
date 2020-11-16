@@ -13,8 +13,6 @@ Failure in python_middle_error.py:
     GAMMA4
     GAMMA5
     GAMMA6
-    GAMMA7
-    GAMMA8
 
   when running command:
     /usr/bin/python python_middle_error.py

@@ -3,7 +3,23 @@ Failure in python_missing_output.py:
   The CHECK on line 8 wants:
     NotPrinted
 
-  but there was no remaining output to match.
+  which failed to match line stdout:2:
+    Second
+
+  Context:
+    First
+     <= nothing to match 'NotPrinted'
+    Second
+    Third
+    1 (nothing to match)
+    2
+    3
+    4
+    [...] from line 34 stdout:14
+    6
+    6
+    6
+    Fourth <= does not match '{{\\d}}'
 
   when running command:
     /usr/bin/python python_missing_output.py

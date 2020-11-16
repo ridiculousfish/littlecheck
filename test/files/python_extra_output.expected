@@ -3,5 +3,9 @@ Failure in python_extra_output.py:
   There were no remaining checks left to match stdout:2:
     Second
 
+  Context:
+    First
+    Second (nothing to match)
+
   when running command:
     /usr/bin/python python_extra_output.py

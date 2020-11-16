@@ -9,7 +9,6 @@ Failure in inline-check.py:
   Context:
     ok
     mismatch <= does not match 'match'
-    
+
   when running command:
     /bin/sh inline-check.py
-

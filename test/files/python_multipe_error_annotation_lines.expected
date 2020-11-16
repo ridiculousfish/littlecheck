@@ -14,7 +14,7 @@ Failure in python_multipe_error_annotation_lines.py:
   Context:
     fine so far
     something failed <= does not match 'things should be cool'
-    now stdout is broken
+    now stdout is broken (nothing to match)
 
   when running command:
     /usr/bin/python python_multipe_error_annotation_lines.py
