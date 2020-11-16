@@ -239,17 +239,17 @@ class TestFailure(object):
                         ]
                     lasthi = ahi
 
-                    for a, b in zip_longest(self.text1[alo:ahi], self.text2[blo:bhi]):
+                    for a, b in zip_longest(self.lines[alo:ahi], self.checks[blo:bhi]):
                         # Clean up strings for use in a format string - double up the curlies.
-                        astr = color + a.replace("{", "{{").replace("}", "}}") + "{RESET}" if a else ""
-                        if b: b = b.replace("{", "{{").replace("}", "}}")
+                        astr = color + a.escaped_text().replace("{", "{{").replace("}", "}}") + "{RESET}" if a else ""
+                        if b: bstr = "'{BLUE}" + b.line.escaped_text().replace("{", "{{").replace("}", "}}") + "{RESET}'" + " on line " + str(b.line.number)
 
                         if op == 'equal':
                             fmtstrs += ["    " + astr]
                         elif b and a:
-                            fmtstrs += ["    " + astr + " <= does not match '{BLUE}" + b + "{RESET}'"]
+                            fmtstrs += ["    " + astr + " <= does not match " + bstr]
                         elif b:
-                            fmtstrs += ["    " + astr + " <= nothing to match '{BLUE}" + b + "{RESET}'"]
+                            fmtstrs += ["    " + astr + " <= nothing to match " + bstr]
                         elif not b:
                             string = "    " + astr
                             string += " (nothing to match)"
