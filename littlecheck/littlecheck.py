@@ -156,14 +156,12 @@ class RunCmd(object):
 
 
 class TestFailure(object):
-    def __init__(self, line, check, testrun, diff=None, text1=[], text2=[], lines=[], checks=[]):
+    def __init__(self, line, check, testrun, diff=None, lines=[], checks=[]):
         self.line = line
         self.check = check
         self.testrun = testrun
         self.error_annotation_lines = None
         self.diff = diff
-        self.text1 = text1
-        self.text2 = text2
         self.lines = lines
         self.checks = checks
 
@@ -345,11 +343,11 @@ class TestRun(object):
         # If there's a mismatch or still lines or checkers, we have a failure.
         # Otherwise it's success.
         if mismatches:
-            return TestFailure(mismatches[0][0], mismatches[0][1], self, diff=diff, text1=text1, text2=text2, lines=usedlines, checks=usedchecks)
+            return TestFailure(mismatches[0][0], mismatches[0][1], self, diff=diff, lines=usedlines, checks=usedchecks)
         elif lineq:
-            return TestFailure(lineq[-1], None, self, diff=diff, text1=text1, text2=text2, lines=usedlines, checks=usedchecks)
+            return TestFailure(lineq[-1], None, self, diff=diff, lines=usedlines, checks=usedchecks)
         elif checkq:
-            return TestFailure(None, checkq[-1], self, diff=diff, text1=text1, text2=text2, lines=usedlines, checks=usedchecks)
+            return TestFailure(None, checkq[-1], self, diff=diff, lines=usedlines, checks=usedchecks)
         else:
             # Success!
             return None
