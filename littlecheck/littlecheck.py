@@ -318,7 +318,17 @@ class TestRun(object):
             else:
                 text1.append(line.escaped_text())
                 usedlines.append(line)
-                text2.append(check.line.escaped_text())
+                # HACK: Theoretically it's possible that
+                # the line is the same as the CHECK regex but doesn't match
+                # (e.g. both are `\s+` or something).
+                # Since we only need this for the SequenceMatcher to *compare*,
+                # we give it a fake non-matching check in those cases.
+                etext = check.line.escaped_text()
+                if etext != line.escaped_text():
+                    text2.append(etext)
+                else:
+                    text2.append(" " + etext)
+
                 usedchecks.append(check)
                 mismatches.append((line, check))
                 # Failed to match.
