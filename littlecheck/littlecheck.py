@@ -35,10 +35,6 @@ class Config(object):
         self.colorize = False
         # Whether to show which file was tested.
         self.progress = False
-        # How many after lines to print
-        self.after = 5
-        # How many before lines to print
-        self.before = 5
 
     def colors(self):
         """ Return a dictionary mapping color names to ANSI escapes """
@@ -155,17 +151,13 @@ class RunCmd(object):
 
 
 class TestFailure(object):
-    def __init__(self, line, check, testrun, before=None, after=None):
+    def __init__(self, line, check, testrun):
         self.line = line
         self.check = check
         self.testrun = testrun
         self.error_annotation_lines = None
-        # The output that comes *after* the failure.
-        self.after = after
-        self.before = before
 
     def message(self):
-        afterlines = self.testrun.config.after
         fields = self.testrun.config.colors()
         fields["name"] = self.testrun.name
         fields["subbed_command"] = self.testrun.subbed_command
@@ -221,20 +213,6 @@ class TestFailure(object):
                 "  additional output on stderr:{error_annotation_lineno}:",
                 "    {BOLD}{error_annotation}{RESET}",
             ]
-        if self.before or self.after:
-            fmtstrs += ["  Context:"]
-
-            if self.before:
-                fields["before_output"] = "    ".join(self.before)[:-1]
-                fmtstrs += ["    {BOLD}{before_output}"]
-
-            fmtstrs += [
-                "    {RED}{output_line}{RESET} <= does not match '{LIGHTBLUE}{input_line}{RESET}'",
-            ]
-
-            if self.after is not None:
-                fields["additional_output"] = "    ".join(self.after[:afterlines])
-                fmtstrs += ["    {BOLD}{additional_output}{RESET}"]
         fmtstrs += ["  when running command:", "    {subbed_command}"]
         return "\n".join(fmtstrs).format(**fields)
 
@@ -278,8 +256,6 @@ class TestRun(object):
         # Reverse our lines and checks so we can pop off the end.
         lineq = lines[::-1]
         checkq = checks[::-1]
-        # We keep the last couple of lines in a deque so we can show context.
-        before = deque(maxlen=self.config.before)
         while lineq and checkq:
             line = lineq[-1]
             check = checkq[-1]
@@ -287,7 +263,6 @@ class TestRun(object):
                 # This line matched this checker, continue on.
                 lineq.pop()
                 checkq.pop()
-                before.append(line)
             elif line.is_empty_space():
                 # Skip all whitespace input lines.
                 lineq.pop()
@@ -300,12 +275,6 @@ class TestRun(object):
                     line,
                     check,
                     self,
-                    before=[line.escaped_text() + "\n" for line in before],
-                    after=[
-                        line.escaped_text() + "\n"
-                        for line in lineq[::-1]
-                        if not line.is_empty_space()
-                    ],
                 )
         # Drain empties.
         while lineq and lineq[-1].is_empty_space():
@@ -512,22 +481,6 @@ def get_argparse():
         default=False,
     )
     parser.add_argument("file", nargs="+", help="File to check")
-    parser.add_argument(
-        "-A",
-        "--after",
-        type=int,
-        help="How many non-empty lines of output after a failure to print (default: 5)",
-        action="store",
-        default=5,
-    )
-    parser.add_argument(
-        "-B",
-        "--before",
-        type=int,
-        help="How many non-empty lines of output before a failure to print (default: 5)",
-        action="store",
-        default=5,
-    )
     return parser
 
 
@@ -542,12 +495,6 @@ def main():
     config.colorize = sys.stdout.isatty()
     config.progress = args.progress
     fields = config.colors()
-    config.after = args.after
-    config.before = args.before
-    if config.before < 0:
-        raise ValueError("Before must be at least 0")
-    if config.after < 0:
-        raise ValueError("After must be at least 0")
 
     for path in args.file:
         fields["path"] = path
