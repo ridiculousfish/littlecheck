@@ -347,6 +347,7 @@ class TestRun(object):
         # Store remaining checks for the diff
         for i in checkq[::-1]:
             text2.append(i.line.escaped_text())
+            usedchecks.append(i)
 
         # Do a SequenceMatch! This gives us a diff-like thing.
         diff = SequenceMatcher(a=text1, b=text2)
