@@ -240,6 +240,8 @@ class TestFailure(object):
                         ]
                     lasthi = ahi
 
+                    # We print one "no more checks" after the last check and then skip any markers
+                    lastcheck = False
                     for a, b in zip_longest(self.lines[alo:ahi], self.checks[blo:bhi]):
                         # Clean up strings for use in a format string - double up the curlies.
                         astr = color + a.escaped_text(for_formatting=True) + "{RESET}" if a else ""
@@ -255,7 +257,11 @@ class TestFailure(object):
                             fmtstrs += ["    " + astr + " <= nothing to match " + b.type + " " + bstr]
                         elif not b:
                             string = "    " + astr
-                            if lastcheckline is not None:
+                            if bhi == len(self.checks):
+                                if not lastcheck:
+                                    string += " (no more checks)"
+                                    lastcheck = True
+                            elif lastcheckline is not None:
                                 string += " (nothing to match, previous check on line " + str(lastcheckline) + ")"
                             else:
                                 string += " (nothing to match, no previous check)"
