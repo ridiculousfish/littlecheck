@@ -226,6 +226,7 @@ class TestFailure(object):
         if self.diff:
             fmtstrs += ["  Context:"]
             lasthi = 0
+            lastcheckline = None
             for d in self.diff.get_grouped_opcodes():
                 for op, alo, ahi, blo, bhi in d:
                     color="{BOLD}"
@@ -242,7 +243,9 @@ class TestFailure(object):
                     for a, b in zip_longest(self.lines[alo:ahi], self.checks[blo:bhi]):
                         # Clean up strings for use in a format string - double up the curlies.
                         astr = color + a.escaped_text(for_formatting=True) + "{RESET}" if a else ""
-                        if b: bstr = "'{BLUE}" + b.line.escaped_text(for_formatting=True) + "{RESET}'" + " on line " + str(b.line.number)
+                        if b:
+                            bstr = "'{BLUE}" + b.line.escaped_text(for_formatting=True) + "{RESET}'" + " on line " + str(b.line.number)
+                            lastcheckline = b.line.number
 
                         if op == 'equal':
                             fmtstrs += ["    " + astr]
@@ -252,7 +255,10 @@ class TestFailure(object):
                             fmtstrs += ["    " + astr + " <= nothing to match " + b.type + " " + bstr]
                         elif not b:
                             string = "    " + astr
-                            string += " (nothing to match)"
+                            if lastcheckline is not None:
+                                string += " (nothing to match, previous check on line " + str(lastcheckline) + ")"
+                            else:
+                                string += " (nothing to match, no previous check)"
                             fmtstrs.append(string)
             fmtstrs.append("")
         fmtstrs += ["  when running command:", "    {subbed_command}"]
