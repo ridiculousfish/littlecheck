@@ -262,9 +262,9 @@ class TestFailure(object):
                                     string += " <= no more checks"
                                     lastcheck = True
                             elif lastcheckline is not None:
-                                string += " <= nothing to match, previous check on line " + str(lastcheckline)
+                                string += " <= no check matches this, previous check on line " + str(lastcheckline)
                             else:
-                                string += " <= nothing to match, no previous check"
+                                string += " <= no check matches"
                             fmtstrs.append(string)
             fmtstrs.append("")
         fmtstrs += ["  when running command:", "    {subbed_command}"]
