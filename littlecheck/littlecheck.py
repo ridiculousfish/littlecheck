@@ -236,7 +236,7 @@ class TestFailure(object):
                     if alo > lasthi:
                         fmtstrs += [
                             "    [...] from line " + str(self.checks[blo].line.number)
-                            + " " + self.lines[alo].file + ":" + str(self.lines[alo].number)
+                            + " (" + self.lines[alo].file + ":" + str(self.lines[alo].number) + ")"
                         ]
                     lasthi = ahi
 
