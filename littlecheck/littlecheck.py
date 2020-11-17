@@ -247,9 +247,9 @@ class TestFailure(object):
                         if op == 'equal':
                             fmtstrs += ["    " + astr]
                         elif b and a:
-                            fmtstrs += ["    " + astr + " <= does not match " + bstr]
+                            fmtstrs += ["    " + astr + " <= does not match " + b.type + " " + bstr]
                         elif b:
-                            fmtstrs += ["    " + astr + " <= nothing to match " + bstr]
+                            fmtstrs += ["    " + astr + " <= nothing to match " + b.type + " " + bstr]
                         elif not b:
                             string = "    " + astr
                             string += " (nothing to match)"
