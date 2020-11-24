@@ -404,7 +404,7 @@ class TestRun(object):
             usedchecks.append(i)
 
         # Do a SequenceMatch! This gives us a diff-like thing.
-        diff = SequenceMatcher(a=text1, b=text2)
+        diff = SequenceMatcher(a=text1, b=text2, autojunk=False)
         # If there's a mismatch or still lines or checkers, we have a failure.
         # Otherwise it's success.
         if mismatches:
