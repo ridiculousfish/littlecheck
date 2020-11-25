@@ -26,6 +26,9 @@ print("6")
 # CHECK: {{\d}}
 print("6")
 # CHECK: {{\d}}
+print("foobar")
+print("barbar")
+# CHECK: {{barbar}}
 print("6")
 # CHECK: {{\d}}
 print("6")

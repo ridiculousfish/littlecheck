@@ -11,15 +11,20 @@ Failure in python_missing_output.py:
      <= nothing to match CHECK 'NotPrinted' on line 8
     Second
     Third
-    1 <= no check matches this, previous check on line 13
-    2
-    3
-    4
-    [...] from line 34 (stdout:14):
+    1
+    [...] from line 24 (stdout:8):
+    5
+    6
+    6
+    foobar <= no check matches this, previous check on line 28
+    barbar
+    6
+    6
+    [...] from line 39 (stdout:16):
     6
     6
     6
-    Fourth <= does not match CHECK '{{\\d}}' on line 40
+    Fourth <= no more checks
 
   when running command:
     /usr/bin/python python_missing_output.py
