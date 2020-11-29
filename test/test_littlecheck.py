@@ -66,3 +66,6 @@ class LittlecheckTest(unittest.TestCase):
 
     def test_py_whitespace(self):
         self.do_1_path_test("python_whitespace")
+
+    def test_py_replace(self):
+        self.do_1_path_test("python_doublereplace")

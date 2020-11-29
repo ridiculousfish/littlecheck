@@ -1,0 +1,17 @@
+Failure in python_doublereplace.py:
+
+  The CHECK on line 14 wants:
+    0
+
+  which failed to match line stdout:3:
+    2
+
+  Context:
+    Checking that --quiet quits early - if this is broken it hangs
+    0
+    2 <= does not match CHECK '0' on line 14
+    0
+    0
+
+  when running command:
+    /usr/bin/python python_doublereplace.py
