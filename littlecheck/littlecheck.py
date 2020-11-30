@@ -139,7 +139,8 @@ class Line(object):
         if isinstance(other, CheckCmd):
             return other.regex.match(self.text)
         if isinstance(other, Line):
-            return self.text == other.text and self.number == other.number and self.file == other.file
+            # We only compare the text here so SequenceMatcher can reshuffle these
+            return self.text == other.text
         raise NotImplementedError
 
     def subline(self, text):
@@ -275,11 +276,6 @@ class TestFailure(object):
                     # We print one "no more checks" after the last check and then skip any markers
                     lastcheck = False
                     for a, b in zip_longest(self.lines[alo:ahi], self.checks[blo:bhi]):
-                        if op == "replace" and b and b == a:
-                            # Sometimes we get a "replace" op with lines that don't actually need to be replaced.
-                            # Workaround it by explicitly checking.
-                            color = "{BOLD}"
-                            op = "equal"
                         # Clean up strings for use in a format string - double up the curlies.
                         astr = (
                             color + a.escaped_text(for_formatting=True) + "{RESET}"
@@ -505,7 +501,7 @@ class CheckCmd(object):
         if other is None:
             return False
         if isinstance(other, CheckCmd):
-            return self.line == other.line and self.type == other.type and self.regex == other.regex
+            return self.regex == other.regex
         if isinstance(other, Line):
             return self.regex.match(other.text)
         if isinstance(other, str):

@@ -9,9 +9,10 @@ Failure in python_doublereplace.py:
   Context:
     Checking that --quiet quits early - if this is broken it hangs
     0
-    2 <= does not match CHECK '0' on line 14
+    2 <= no check matches this, previous check on line 12
     0
     0
+     <= nothing to match CHECK '0' on line 19
 
   when running command:
     /usr/bin/python python_doublereplace.py
