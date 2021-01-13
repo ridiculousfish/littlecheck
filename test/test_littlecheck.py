@@ -69,3 +69,6 @@ class LittlecheckTest(unittest.TestCase):
 
     def test_py_replace(self):
         self.do_1_path_test("python_doublereplace")
+
+    def test_skip(self):
+        self.do_1_path_test("shell_skip")
