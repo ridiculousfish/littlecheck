@@ -32,6 +32,7 @@ CHECK_STDOUT_RE = re.compile(COMMENT_RE + r"CHECK:\s+(.*)\n")
 # A regex capturing lines that should be checked against stderr.
 CHECK_STDERR_RE = re.compile(COMMENT_RE + r"CHECKERR:\s+(.*)\n")
 
+SKIP = object()
 
 class Config(object):
     def __init__(self):
@@ -460,6 +461,11 @@ class TestRun(object):
         if status == 126:
             raise CheckerError("Command is not executable: " + self.subbed_command)
 
+        # If a test returns 125, we skip it and don't even attempt to compare output.
+        # This is similar to what `git bisect run` does.
+        if status == 125:
+            return SKIP
+
         outlines = [
             Line(text, idx + 1, "stdout")
             for idx, text in enumerate(split_by_newlines(stdout))
@@ -593,7 +599,9 @@ def check_file(input_file, name, subs, config, failure_handler):
     checker = Checker(name, lines)
     for runcmd in checker.runcmds:
         failure = TestRun(name, runcmd, checker, subs, config).run()
-        if failure:
+        if failure is SKIP:
+            return failure
+        elif failure:
             failure_handler(failure)
             success = False
     return success
@@ -670,14 +678,20 @@ def main():
         subs = def_subs.copy()
         subs["s"] = path
         starttime = datetime.datetime.now()
-        if not check_path(path, subs, config, TestFailure.print_message):
+        ret = check_path(path, subs, config, TestFailure.print_message)
+        if not ret:
             failure_count += 1
         elif config.progress:
             endtime = datetime.datetime.now()
             duration_ms = round((endtime - starttime).total_seconds() * 1000)
+            reason = "ok"
+            color = "{GREEN}"
+            if ret is SKIP:
+                reason = "SKIPPED"
+                color = "{BLUE}"
             print(
-                "{GREEN}ok{RESET} ({duration} ms)".format(
-                    duration=duration_ms, **fields
+                (color + "{reason}{RESET} ({duration} ms)").format(
+                    duration=duration_ms, reason=reason, **fields
                 )
             )
     sys.exit(failure_count)
