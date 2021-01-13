@@ -457,6 +457,8 @@ class TestRun(object):
         status = proc.returncode
         if status == 127:
             raise CheckerError("Command could not be found: " + self.subbed_command)
+        if status == 126:
+            raise CheckerError("Command is not executable: " + self.subbed_command)
 
         outlines = [
             Line(text, idx + 1, "stdout")
