@@ -358,6 +358,20 @@ def perform_substitution(input_str, subs):
     return re.sub(r"%(%|[a-zA-Z0-9_-]+)", subber, input_str)
 
 
+def runproc(cmd):
+    """ Wrapper around subprocess.Popen to save typing """
+    PIPE = subprocess.PIPE
+    proc = subprocess.Popen(
+        cmd,
+        stdin=PIPE,
+        stdout=PIPE,
+        stderr=PIPE,
+        shell=True,
+        close_fds=True,  # For Python 2.6 as shipped on RHEL 6
+    )
+    return proc
+
+
 class TestRun(object):
     def __init__(self, name, runcmd, checker, subs, config):
         self.name = name
@@ -443,14 +457,7 @@ class TestRun(object):
         PIPE = subprocess.PIPE
         if self.config.verbose:
             print(self.subbed_command)
-        proc = subprocess.Popen(
-            self.subbed_command,
-            stdin=PIPE,
-            stdout=PIPE,
-            stderr=PIPE,
-            shell=True,
-            close_fds=True,  # For Python 2.6 as shipped on RHEL 6
-        )
+        proc = runproc(self.subbed_command)
         stdout, stderr = proc.communicate()
         # HACK: This is quite cheesy: POSIX specifies that sh should return 127 for a missing command.
         # Technically it's also possible to return it in other conditions.
