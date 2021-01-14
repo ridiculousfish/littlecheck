@@ -1,0 +1,13 @@
+Failure in no_skip.py:
+
+  The CHECK on line 6 wants:
+    This should never be compared
+
+  which failed to match line stdout:1:
+    Oh, but it is!
+
+  Context:
+    Oh, but it is! <= does not match CHECK 'This should never be compared' on line 6
+
+  when running command:
+    /usr/bin/python no_skip.py
