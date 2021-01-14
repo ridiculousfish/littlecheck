@@ -1,6 +1,5 @@
 #!/bin/sh
-
-exit 125
+# REQUIRES: false
 
 # CHECK: This should never be compared
 # CHECKERR: Neither should this
