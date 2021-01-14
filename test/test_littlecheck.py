@@ -13,7 +13,7 @@ class LittlecheckTest(unittest.TestCase):
         test_dir = os.path.dirname(os.path.abspath(__file__))
         os.chdir(os.path.join(test_dir, "files"))
 
-    def do_1_path_test(self, name):
+    def do_1_path_test(self, name, skip=False):
         """ Run a single test. The name is the test name.
            The input file is the name with .py extension, the expected
            output of littlecheck is the name with .expected extension.
@@ -29,7 +29,10 @@ class LittlecheckTest(unittest.TestCase):
             expect_text = fd.read().strip()
             expect_success = not expect_text
             self.assertEqual(failures_message, expect_text)
-            self.assertEqual(success, expect_success)
+            if skip:
+                self.assertEqual(success, littlecheck.SKIP)
+            else:
+                self.assertEqual(success, expect_success)
 
     def test_py_ok(self):
         self.do_1_path_test("python_ok")
@@ -71,4 +74,4 @@ class LittlecheckTest(unittest.TestCase):
         self.do_1_path_test("python_doublereplace")
 
     def test_skip(self):
-        self.do_1_path_test("shell_skip")
+        self.do_1_path_test("shell_skip", skip=True)

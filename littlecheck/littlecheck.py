@@ -25,6 +25,7 @@ COMMENT_RE = r"^(?:[^#].*)?#\s*"
 
 # A regex showing how to run the file.
 RUN_RE = re.compile(COMMENT_RE + r"RUN:\s+(.*)\n")
+REQUIRES_RE = re.compile(COMMENT_RE + r"REQUIRES:\s+(.*)\n")
 
 # A regex capturing lines that should be checked against stdout.
 CHECK_STDOUT_RE = re.compile(COMMENT_RE + r"CHECK:\s+(.*)\n")
@@ -590,6 +591,8 @@ class Checker(object):
             else:
                 raise CheckerError("No runlines ('# RUN') found")
 
+        self.requirecmds = [RunCmd.parse(sl) for sl in group1s(REQUIRES_RE)]
+
         # Find check cmds.
         self.outchecks = [
             CheckCmd.parse(sl, "CHECK") for sl in group1s(CHECK_STDOUT_RE)
@@ -604,11 +607,22 @@ def check_file(input_file, name, subs, config, failure_handler):
     success = True
     lines = Line.readfile(input_file, name)
     checker = Checker(name, lines)
+
+    # Run all the REQUIRES lines first,
+    # if any of them fail it's a SKIP
+    for reqcmd in checker.requirecmds:
+        proc = runproc(
+            perform_substitution(reqcmd.args, subs)
+        )
+        stdout, stderr = proc.communicate()
+        status = proc.returncode
+        if proc.returncode > 0:
+            return SKIP
+
+    # Only then run the RUN lines.
     for runcmd in checker.runcmds:
         failure = TestRun(name, runcmd, checker, subs, config).run()
-        if failure is SKIP:
-            return failure
-        elif failure:
+        if failure:
             failure_handler(failure)
             success = False
     return success
