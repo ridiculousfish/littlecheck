@@ -18,7 +18,7 @@ class LittlecheckTest(unittest.TestCase):
            The input file is the name with .py extension, the expected
            output of littlecheck is the name with .expected extension.
         """
-        test_path = name + ".py"
+        test_path = name + ".py" if not "." in name else name
         expected_output_path = name + ".expected"
         subs = {"%": "%", "s": test_path}
         conf = littlecheck.Config()
@@ -74,4 +74,7 @@ class LittlecheckTest(unittest.TestCase):
         self.do_1_path_test("python_doublereplace")
 
     def test_skip(self):
-        self.do_1_path_test("shell_skip", skip=True)
+        self.do_1_path_test("skip", skip=True)
+
+    def test_require_succeeds(self):
+        self.do_1_path_test("no_skip", skip=False)

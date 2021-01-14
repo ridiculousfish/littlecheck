@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/python
 # REQUIRES: false
 
 # CHECK: This should never be compared
