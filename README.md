@@ -62,6 +62,16 @@ $stderr.puts "this goes to stderr"
 # CHECKERR: this goes to stderr
 ```
 
+To skip tests, littlecheck provides the `# REQUIRES` directive. Anything given there will be run as a shell command (with /bin/sh, with the substitutions applied), and if any REQUIRES returns non-zero the script will be skipped:
+
+```shell
+# RUN: /bin/sh %s
+# Only run this test on macOS:
+# REQUIRES: test $(uname) = Darwin
+# Only run it if git is installed
+# REQUIRES: command -v git
+```
+
 # Integrating littlecheck
 
 To integrate littlecheck into your project, simply copy the file `littlecheck/littlecheck.py` into the appropriate place in your source tree. No other files are required.
