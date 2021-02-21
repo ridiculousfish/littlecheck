@@ -81,7 +81,16 @@ class LittlecheckTest(unittest.TestCase):
         self.do_1_path_test("no_skip", skip=False)
 
     def test_exe_found(self):
-        self.do_1_path_test("exe_found")
+        # We only want to know that we don't get a CheckerError,
+        # the actual error message here is platform-dependent.
+        test_path = "exe_found.py"
+        subs = {"%": "%", "s": test_path}
+        conf = littlecheck.Config()
+        failures = []
+        success = littlecheck.check_path(test_path, subs, conf, failures.append)
+        self.assertEqual(success, False)
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(isinstance(failures[0], littlecheck.littlecheck.TestFailure), True)
 
     def test_exe_not_found(self):
         try:
