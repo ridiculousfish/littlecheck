@@ -1,0 +1,13 @@
+Failure in exe_found.py:
+
+  There were no remaining checks left to match stdout:1:
+    fart
+
+  additional output on stderr:1:
+    exe_found.py: Zeile 3: ath: Kommando nicht gefunden.
+
+  Context:
+    fart <= no more checks
+
+  when running command:
+    /bin/sh exe_found.py
