@@ -469,11 +469,6 @@ class TestRun(object):
         if status == 126:
             raise CheckerError("Command is not executable: " + self.subbed_command)
 
-        # If a test returns 125, we skip it and don't even attempt to compare output.
-        # This is similar to what `git bisect run` does.
-        if status == 125:
-            return SKIP
-
         outlines = [
             Line(text, idx + 1, "stdout")
             for idx, text in enumerate(split_by_newlines(stdout))
