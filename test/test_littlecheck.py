@@ -79,9 +79,6 @@ class LittlecheckTest(unittest.TestCase):
     def test_require_succeeds(self):
         self.do_1_path_test("no_skip", skip=False)
 
-    def test_require_succeeds(self):
-        self.do_1_path_test("no_skip", skip=False)
-
     def test_exe_found(self):
         self.do_1_path_test("exe_found")
 
