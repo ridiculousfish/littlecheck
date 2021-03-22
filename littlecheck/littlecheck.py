@@ -467,7 +467,6 @@ class TestRun(object):
             """
             return [s + "\n" for s in s.decode("utf-8").split("\n")]
 
-        PIPE = subprocess.PIPE
         if self.config.verbose:
             print(self.subbed_command)
         proc = runproc(self.subbed_command)
@@ -626,8 +625,7 @@ def check_file(input_file, name, subs, config, failure_handler):
         proc = runproc(
             perform_substitution(reqcmd.args, subs)
         )
-        stdout, stderr = proc.communicate()
-        status = proc.returncode
+        proc.communicate()
         if proc.returncode > 0:
             return SKIP
 
