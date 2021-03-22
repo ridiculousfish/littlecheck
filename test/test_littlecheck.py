@@ -12,6 +12,7 @@ class LittlecheckTest(unittest.TestCase):
         """ Switch to test/files directory. """
         test_dir = os.path.dirname(os.path.abspath(__file__))
         os.chdir(os.path.join(test_dir, "files"))
+        os.environ["LANG"] = "C"
 
     def do_1_path_test(self, name, skip=False):
         """ Run a single test. The name is the test name.

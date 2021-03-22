@@ -4,7 +4,7 @@ Failure in exe_found.py:
     fart
 
   additional output on stderr:1:
-    exe_found.py: Zeile 3: ath: Kommando nicht gefunden.
+    exe_found.py: line 3: ath: command not found
 
   Context:
     fart <= no more checks
