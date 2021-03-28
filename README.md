@@ -72,6 +72,8 @@ To skip tests, littlecheck provides the `# REQUIRES` directive. Anything given t
 # REQUIRES: command -v git
 ```
 
+littlecheck will exit with status 125 if all tests were skipped. Otherwise, it exits with status 1 with at least one test failed, else 0.
+
 # Integrating littlecheck
 
 To integrate littlecheck into your project, simply copy the file `littlecheck/littlecheck.py` into the appropriate place in your source tree. No other files are required.
