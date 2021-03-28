@@ -696,7 +696,7 @@ def main():
     def_subs.update(parse_subs(args.substitute))
 
     tests_count = 0
-    failure_count = 0
+    failed = False
     skip_count = 0
     config = Config()
     config.colorize = sys.stdout.isatty()
@@ -714,7 +714,7 @@ def main():
         starttime = datetime.datetime.now()
         ret = check_path(path, subs, config, TestFailure.print_message)
         if not ret:
-            failure_count += 1
+            failed = True
         elif config.progress:
             endtime = datetime.datetime.now()
             duration_ms = round((endtime - starttime).total_seconds() * 1000)
@@ -737,7 +737,7 @@ def main():
     if skip_count > 0 and skip_count == tests_count:
         sys.exit(125)
 
-    sys.exit(failure_count)
+    sys.exit(1 if failed else 0)
 
 
 if __name__ == "__main__":
