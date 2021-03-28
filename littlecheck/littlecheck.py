@@ -695,13 +695,16 @@ def main():
     def_subs = {"%": "%"}
     def_subs.update(parse_subs(args.substitute))
 
+    tests_count = 0
     failure_count = 0
+    skip_count = 0
     config = Config()
     config.colorize = sys.stdout.isatty()
     config.progress = args.progress
     fields = config.colors()
 
     for path in args.file:
+        tests_count += 1
         fields["path"] = path
         if config.progress:
             print("Testing file {path} ... ".format(**fields), end="")
@@ -718,6 +721,7 @@ def main():
             reason = "ok"
             color = "{GREEN}"
             if ret is SKIP:
+                skip_count += 1
                 reason = "SKIPPED"
                 color = "{BLUE}"
             print(
@@ -725,6 +729,14 @@ def main():
                     duration=duration_ms, reason=reason, **fields
                 )
             )
+
+    # To facilitate integration with testing frameworks, use exit code 125 to indicate that all
+    # tests have been skipped (primarily for use when tests are run one at a time). Exit code 125 is
+    # used to indicate to automated `git bisect` runs that a revision has been skipped; we use it
+    # for the same reasons git does.
+    if skip_count > 0 and skip_count == tests_count:
+        sys.exit(125)
+
     sys.exit(failure_count)
 
 
