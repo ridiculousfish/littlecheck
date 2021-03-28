@@ -591,13 +591,13 @@ class Checker(object):
 
         # Find run commands.
         self.runcmds = [RunCmd.parse(sl) for sl in group1s(RUN_RE)]
+        self.shebang_cmd = None
         if not self.runcmds:
             # If no RUN command has been given, fall back to the shebang.
             if lines[0].text.startswith("#!"):
                 # Remove the "#!" at the beginning, and the newline at the end.
                 cmd = lines[0].text[2:-1]
-                if not find_command(cmd):
-                    raise CheckerError("Command could not be found: " + cmd)
+                self.shebang_cmd = cmd
                 self.runcmds = [RunCmd(cmd + " %s", lines[0])]
             else:
                 raise CheckerError("No runlines ('# RUN') found")
@@ -628,6 +628,9 @@ def check_file(input_file, name, subs, config, failure_handler):
         proc.communicate()
         if proc.returncode > 0:
             return SKIP
+
+    if checker.shebang_cmd is not None and not find_command(checker.shebang_cmd):
+        raise CheckerError("Command could not be found: " + checker.shebang_cmd)
 
     # Only then run the RUN lines.
     for runcmd in checker.runcmds:
