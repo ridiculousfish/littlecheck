@@ -433,6 +433,12 @@ class TestRun(object):
         for i in checkq[::-1]:
             usedchecks.append(i)
 
+        # If we have no more output, there's no reason to give
+        # SCREENFULS of text.
+        # So we truncate the check list.
+        if len(usedchecks) > len(usedlines):
+            usedchecks = usedchecks[:len(usedlines) + 5]
+
         # Do a SequenceMatch! This gives us a diff-like thing.
         diff = SequenceMatcher(a=usedlines, b=usedchecks, autojunk=False)
         # If there's a mismatch or still lines or checkers, we have a failure.
