@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: © 2019 ridiculousfish and littlecheck contributors
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # littlecheck - command line tool tester
 
 littlecheck is a tool for testing command line tools. It is heavily inspired by the [lit](http://llvm.org/docs/CommandGuide/lit.html) and [FileCheck](https://www.llvm.org/docs/CommandGuide/FileCheck.html) combo. littlecheck is much simpler: it requires only one Python file and has no dependencies except for Python itself (2.7 or 3).

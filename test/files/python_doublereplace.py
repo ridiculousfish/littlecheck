@@ -1,4 +1,9 @@
 #!/usr/bin/python
+
+# SPDX-FileCopyrightText: © 2020 ridiculousfish and littlecheck contributors
+#
+# SPDX-License-Identifier: CC0-1.0
+
 #
 # This file causes SequenceMatcher to return a "replace" from the failing "0" line *including the next line*,
 # even tho they are the same!

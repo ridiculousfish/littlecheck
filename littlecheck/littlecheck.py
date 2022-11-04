@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# SPDX-FileCopyrightText: © 2019 ridiculousfish and littlecheck contributors
+#
+# SPDX-License-Identifier: CC0-1.0
+
 """ Command line test driver. """
 
 from __future__ import unicode_literals
