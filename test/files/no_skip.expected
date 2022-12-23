@@ -7,7 +7,7 @@ Failure in no_skip.py:
     Oh, but it is!
 
   Context:
-    Oh, but it is! <= does not match CHECK 'This should never be compared' on line 6
+    Oh, but it is! <= does not match CHECK on line 6: This should never be compared
 
   when running command:
     /usr/bin/python no_skip.py

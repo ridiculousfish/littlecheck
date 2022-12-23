@@ -13,7 +13,7 @@ Failure in python_multipe_error_annotation_lines.py:
 
   Context:
     fine so far
-    something failed <= does not match CHECK 'things should be cool' on line 24
+    something failed <= does not match CHECK on line 24: things should be cool
     now stdout is broken <= no more checks
 
   when running command:

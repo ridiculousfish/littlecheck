@@ -8,7 +8,7 @@ Failure in python_missing_output.py:
 
   Context:
     First
-     <= nothing to match CHECK 'NotPrinted' on line 8
+     <= nothing to match CHECK on line 8: NotPrinted
     Second
     Third
     1

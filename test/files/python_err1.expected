@@ -7,7 +7,7 @@ Failure in python_err1.py:
     ALPHA
 
   Context:
-    ALPHA <= does not match CHECKERR 'BETA' on line 6
+    ALPHA <= does not match CHECKERR on line 6: BETA
     GAMMA1 <= no more checks
     GAMMA2
     GAMMA3

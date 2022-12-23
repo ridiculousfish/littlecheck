@@ -7,7 +7,7 @@ Failure in python_color.py:
     \x1b[33mFOO
 
   Context:
-    \x1b[33mFOO <= does not match CHECK 'banana' on line 4
+    \x1b[33mFOO <= does not match CHECK on line 4: banana
 
   when running command:
     /usr/bin/python python_color.py
