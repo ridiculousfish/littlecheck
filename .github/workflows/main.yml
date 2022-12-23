@@ -20,15 +20,17 @@ jobs:
       run: |
         make test
 
-  macos:
+  # macOS CI is deactivated because it can't find /usr/bin/python
+  # for the RUN lines, see https://github.com/ridiculousfish/littlecheck/issues/12
+  # macos:
 
-    runs-on: macos-latest
+  #   runs-on: macos-latest
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install deps
-      run: |
-        brew install python3
-    - name: make test
-      run: |
-        make test
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Install deps
+  #     run: |
+  #       brew install python3
+  #   - name: make test
+  #     run: |
+  #       make test
