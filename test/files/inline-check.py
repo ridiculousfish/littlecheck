@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# SPDX-FileCopyrightText: © 2020 ridiculousfish and littlecheck contributors
+#
+# SPDX-License-Identifier: CC0-1.0
+
 # ignore checks that look commented
 
 # # CHECK: don't check me
