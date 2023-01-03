@@ -13,4 +13,4 @@ Failure in python_multiple_errors.py:
     bar
 
   when running command:
-    /usr/bin/python python_multiple_errors.py
+    /usr/bin/python3 python_multiple_errors.py

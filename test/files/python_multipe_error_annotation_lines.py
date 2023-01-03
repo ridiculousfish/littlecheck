@@ -1,4 +1,4 @@
-# RUN: /usr/bin/python %s
+# RUN: /usr/bin/python3 %s
 
 # Test that, if error output is reported,
 # we get all the remaining lines, not just one.

@@ -14,4 +14,4 @@ Failure in python_out_vs_err.py:
     now stdout is broken <= does not match CHECK on line 17: things should be cool
 
   when running command:
-    /usr/bin/python python_out_vs_err.py
+    /usr/bin/python3 python_out_vs_err.py

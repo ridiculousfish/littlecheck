@@ -19,4 +19,4 @@ Failure in python_missing_check.py:
     GAMMA8
 
   when running command:
-    /usr/bin/python python_missing_check.py
+    /usr/bin/python3 python_missing_check.py

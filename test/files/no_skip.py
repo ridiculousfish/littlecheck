@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # Any system should have an sh capable of `command -v`
 # REQUIRES: command -v sh
 

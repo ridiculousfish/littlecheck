@@ -8,4 +8,4 @@ Failure in python_extra_output.py:
     Second <= no more checks
 
   when running command:
-    /usr/bin/python python_extra_output.py
+    /usr/bin/python3 python_extra_output.py

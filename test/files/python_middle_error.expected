@@ -15,4 +15,4 @@ Failure in python_middle_error.py:
     GAMMA6
 
   when running command:
-    /usr/bin/python python_middle_error.py
+    /usr/bin/python3 python_middle_error.py

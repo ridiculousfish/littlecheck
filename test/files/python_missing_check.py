@@ -1,4 +1,4 @@
-# RUN: /usr/bin/python %s
+# RUN: /usr/bin/python3 %s
 
 import sys
 

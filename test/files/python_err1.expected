@@ -18,4 +18,4 @@ Failure in python_err1.py:
     GAMMA8
 
   when running command:
-    /usr/bin/python python_err1.py
+    /usr/bin/python3 python_err1.py

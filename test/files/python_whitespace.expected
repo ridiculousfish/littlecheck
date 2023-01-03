@@ -13,4 +13,4 @@ Failure in python_whitespace.py:
        four <= does not match CHECK on line 14: {{^}} four
 
   when running command:
-    /usr/bin/python python_whitespace.py
+    /usr/bin/python3 python_whitespace.py

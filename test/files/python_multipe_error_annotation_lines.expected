@@ -17,4 +17,4 @@ Failure in python_multipe_error_annotation_lines.py:
     now stdout is broken <= no more checks
 
   when running command:
-    /usr/bin/python python_multipe_error_annotation_lines.py
+    /usr/bin/python3 python_multipe_error_annotation_lines.py

@@ -1,4 +1,4 @@
-# RUN: /usr/bin/python %s
+# RUN: /usr/bin/python3 %s
 
 # Test that error output is reported.
 # Pretend that something fails and spews to stderr.

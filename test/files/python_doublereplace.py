@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # This file causes SequenceMatcher to return a "replace" from the failing "0" line *including the next line*,
 # even tho they are the same!

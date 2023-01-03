@@ -15,4 +15,4 @@ Failure in python_doublereplace.py:
      <= nothing to match CHECK on line 19: 0
 
   when running command:
-    /usr/bin/python python_doublereplace.py
+    /usr/bin/python3 python_doublereplace.py
