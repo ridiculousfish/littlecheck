@@ -475,7 +475,7 @@ class TestRun(object):
             """Decode a string and split it by newlines only,
             retaining the newlines.
             """
-            return [s + "\n" for s in s.decode("utf-8").split("\n")]
+            return [s + "\n" for s in s.decode("utf-8", errors="backslashreplace").split("\n")]
 
         if self.config.verbose:
             print(self.subbed_command)
