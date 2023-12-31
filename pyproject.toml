@@ -1,0 +1,20 @@
+[project]
+name = "littlecheck"
+description = "littlecheck is a tool for testing command line tools"
+version = "0.1.0"
+readme = "README.md"
+authors = [{ name = "ridiculousfish" }]
+requires-python = ">=2.7"
+urls.Homepage = "https://github.com/ridiculousfish/littlecheck"
+classifiers = [
+    "Programming Language :: Python :: 2",
+    "Programming Language :: Python :: 3",
+    "License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+]
+
+[project.scripts]
+littlecheck = "littlecheck.littlecheck:main"
+
+[build-system]
+requires = ["flit_core>=3.4"]
+build-backend = "flit_core.buildapi"
