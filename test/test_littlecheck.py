@@ -80,6 +80,15 @@ class LittlecheckTest(unittest.TestCase):
     def test_require_succeeds(self):
         self.do_1_path_test("no_skip", skip=False)
 
+    def test_space_replacement(self):
+        test_path = "run_spaces.py"
+        subs = {"%": "%", "s": test_path, "arg": "arg with spaces"}
+        conf = littlecheck.Config()
+        failures = []
+        success = littlecheck.check_path(test_path, subs, conf, failures.append)
+        self.assertEqual(success, True)
+        self.assertEqual(len(failures), 0)
+
     def test_exe_found(self):
         # We only want to know that we don't get a CheckerError,
         # the actual error message here is platform-dependent.
