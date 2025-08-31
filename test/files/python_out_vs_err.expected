@@ -6,12 +6,15 @@ Failure in python_out_vs_err.py:
   which failed to match line stdout:2:
     now stdout is broken
 
-  additional output on stderr:1:
-    something failed
-
   Context:
     fine so far
     now stdout is broken <= does not match CHECK on line 17: things should be cool
+
+  There were no remaining checks left to match stderr:1:
+    something failed
+
+  Context:
+    something failed <= no more checks
 
   when running command:
     /usr/bin/python3 python_out_vs_err.py

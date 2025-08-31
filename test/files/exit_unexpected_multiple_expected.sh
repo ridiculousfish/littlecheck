@@ -1,0 +1,3 @@
+# RUN: /bin/sh %s
+# CHECKEXIT: 1 SIGINT -100
+# CHECKEXIT: KILL -2

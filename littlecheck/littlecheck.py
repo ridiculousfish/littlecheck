@@ -11,6 +11,7 @@ from difflib import SequenceMatcher
 import io
 import re
 import shlex
+import signal
 import sys
 import unicodedata
 
@@ -32,6 +33,8 @@ CHECK_STDOUT_RE = re.compile(COMMENT_RE + r"CHECK:\s+(.*)\n")
 
 # A regex capturing lines that should be checked against stderr.
 CHECK_STDERR_RE = re.compile(COMMENT_RE + r"CHECKERR:\s+(.*)\n")
+
+CHECK_EXIT_RE = re.compile(COMMENT_RE + r"CHECKEXIT:\s+(.*)\n")
 
 VARIABLE_OVERRIDE_RE = re.compile(r"\w+=.*")
 
@@ -193,21 +196,16 @@ class RunCmd(object):
         return RunCmd(line.text, line)
 
 
-class TestFailure(object):
-    def __init__(self, line, check, testrun, diff=None, lines=[], checks=[]):
+class CheckFailure(object):
+    def __init__(self, line, check, diff=None, lines=[], checks=[]):
         self.line = line
         self.check = check
-        self.testrun = testrun
-        self.error_annotation_lines = None
         self.diff = diff
         self.lines = lines
         self.checks = checks
-        self.signal = None
 
-    def message(self):
-        fields = self.testrun.config.colors()
-        fields["name"] = self.testrun.name
-        fields["subbed_command"] = self.testrun.subbed_command
+    def message(self, colors: dict[str, str]) -> str:
+        fields = colors.copy()
         if self.line:
             fields.update(
                 {
@@ -225,13 +223,7 @@ class TestFailure(object):
                     "check_type": self.check.type,
                 }
             )
-        filemsg = "" if self.testrun.config.progress else " in {name}"
-        fmtstrs = ["{RED}Failure{RESET}" + filemsg + ":", ""]
-        if self.signal:
-            fmtstrs += [
-                "  Process was killed by signal {BOLD}" + self.signal + "{RESET}",
-                "",
-            ]
+        fmtstrs = []
         if self.line and self.check:
             fmtstrs += [
                 "  The {check_type} on line {input_lineno} wants:",
@@ -255,21 +247,6 @@ class TestFailure(object):
                 "  There were no remaining checks left to match {output_file}:{output_lineno}:",
                 "    {BOLD}{output_line}{RESET}",
                 "",
-            ]
-        if self.error_annotation_lines:
-            fields["error_annotation"] = "    ".join(
-                [x.text for x in self.error_annotation_lines]
-            )
-            fields["error_annotation_lineno"] = str(
-                self.error_annotation_lines[0].number
-            )
-            if len(self.error_annotation_lines) > 1:
-                fields["error_annotation_lineno"] += ":" + str(
-                    self.error_annotation_lines[-1].number
-                )
-            fmtstrs += [
-                "  additional output on stderr:{error_annotation_lineno}:",
-                "    {BOLD}{error_annotation}{RESET}",
             ]
         if self.diff:
             fmtstrs += ["  Context:"]
@@ -349,7 +326,110 @@ class TestFailure(object):
                                 string += " <= no check matches"
                             fmtstrs.append(string)
             fmtstrs.append("")
+        return "\n".join(fmtstrs).format(**fields)
+
+
+class TestFailure(object):
+    def __init__(
+        self,
+        outcheck: CheckFailure | None,
+        errcheck: CheckFailure | None,
+        exit_code: int,
+        expected_exit_codes: list[int],
+        testrun: "TestRun",
+    ) -> None:
+        self.outcheck = outcheck
+        self.errcheck = errcheck
+        self.exit_code = exit_code
+        self.expected_exit_codes = expected_exit_codes
+        self.testrun = testrun
+
+    def message(self):
+        fields: dict[str, str] = dict(self.testrun.config.colors())
+        fields["name"] = self.testrun.name
+        fields["subbed_command"] = self.testrun.subbed_command
+
+        fmtstrs = ["{RED}Failure{RESET} in {name}:", ""]
+
+        def formatting_escape(input: str) -> str:
+            return input.replace("{", "{{").replace("}", "}}")
+
+        if self.outcheck:
+            fmtstrs.append(
+                formatting_escape(
+                    self.outcheck.message(dict(self.testrun.config.colors()))
+                )
+            )
+
+        if self.errcheck:
+            fmtstrs.append(
+                formatting_escape(
+                    self.errcheck.message(dict(self.testrun.config.colors()))
+                )
+            )
+
+        exitfail = (
+            self.exit_code != 0
+            if len(self.expected_exit_codes) == 0
+            else self.exit_code not in self.expected_exit_codes
+        )
+        if exitfail:
+            # Signal must be positive
+            def format_signal(signal_to_format: int) -> str:
+                import signal
+
+                # Unfortunately strsignal only exists in python 3.8+,
+                # and signal.signals is 3.5+.
+                if hasattr(signal, "Signals"):
+                    try:
+                        sig = signal.Signals(signal_to_format)
+                        strsignal = signal.strsignal(sig.value)
+                        if strsignal:
+                            description = strsignal.split(":")[0]
+                            sig_str = f"{sig.name} ({description})"
+                        else:
+                            sig_str = f"{sig.name}"
+                    except ValueError:
+                        sig_str = str(-signal_to_format)
+                else:
+                    # No easy way to get the full list,
+                    # make up a dict.
+                    signals = {
+                        signal.SIGABRT.value: "SIGABRT",
+                        signal.SIGBUS.value: "SIGBUS",
+                        signal.SIGFPE.value: "SIGFPE",
+                        signal.SIGILL.value: "SIGILL",
+                        signal.SIGSEGV.value: "SIGSEGV",
+                        signal.SIGTERM.value: "SIGTERM",
+                    }
+                    sig_str = signals.get(signal_to_format, str(-signal_to_format))
+                return sig_str
+
+            def format_exit_code(code: int) -> str:
+                if code >= 0:
+                    return str(code)
+                return format_signal(-code)
+
+            if self.exit_code < 0:
+                # If the process is terminated by a signal, `status` will be set to the negative value of the signal, e.g. -9 for SIGKILL.
+                fmtstrs.append(
+                    "  Process was unexpectedly killed by signal {BOLD}"
+                    + format_signal(-self.exit_code)
+                    + "{RESET}"
+                )
+            else:
+                fmtstrs.append(
+                    f"  Process unexpectedly exited with code {self.exit_code}"
+                )
+            if len(self.expected_exit_codes) != 0:
+                # Sorting is important to preserve order, which tests depend on.
+                fmtstrs[
+                    -1
+                ] += f" (expected: {" or ".join(sorted([format_exit_code(code) for code in self.expected_exit_codes]))})"
+            fmtstrs.append("")
+
         fmtstrs += ["  when running command:", "    {subbed_command}"]
+
         return "\n".join(fmtstrs).format(**fields)
 
     def print_message(self):
@@ -455,21 +535,20 @@ class TestRun(object):
         # If there's a mismatch or still lines or checkers, we have a failure.
         # Otherwise it's success.
         if mismatches:
-            return TestFailure(
+            return CheckFailure(
                 mismatches[0][0],
                 mismatches[0][1],
-                self,
                 diff=diff,
                 lines=usedlines,
                 checks=usedchecks,
             )
         elif lineq:
-            return TestFailure(
-                lineq[-1], None, self, diff=diff, lines=usedlines, checks=usedchecks
+            return CheckFailure(
+                lineq[-1], None, diff=diff, lines=usedlines, checks=usedchecks
             )
         elif checkq:
-            return TestFailure(
-                None, checkq[-1], self, diff=diff, lines=usedlines, checks=usedchecks
+            return CheckFailure(
+                None, checkq[-1], diff=diff, lines=usedlines, checks=usedchecks
             )
         else:
             # Success!
@@ -528,44 +607,13 @@ class TestRun(object):
         ]
         outfail = self.check(outlines, self.checker.outchecks)
         errfail = self.check(errlines, self.checker.errchecks)
-        # It's possible that something going wrong on stdout resulted in new
-        # text being printed on stderr. If we have an outfailure, and either
-        # non-matching or unmatched stderr text, then annotate the outfail
-        # with it.
-        if outfail and errfail and errfail.line:
-            outfail.error_annotation_lines = errlines[errfail.line.number - 1 :]
-            # Trim a trailing newline
-            if outfail.error_annotation_lines[-1].text == "\n":
-                del outfail.error_annotation_lines[-1]
-        failure = outfail if outfail else errfail
-
-        if failure and status < 0:
-            # Process was killed by a signal and failed,
-            # add a message.
-            import signal
-
-            # Unfortunately strsignal only exists in python 3.8+,
-            # and signal.signals is 3.5+.
-            if hasattr(signal, "Signals"):
-                try:
-                    sig = signal.Signals(-status)
-                    failure.signal = sig.name + " (" + signal.strsignal(sig.value) + ")"
-                except ValueError:
-                    failure.signal = str(-status)
-            else:
-                # No easy way to get the full list,
-                # make up a dict.
-                signals = {
-                    signal.SIGABRT: "SIGABRT",
-                    signal.SIGBUS: "SIGBUS",
-                    signal.SIGFPE: "SIGFPE",
-                    signal.SIGILL: "SIGILL",
-                    signal.SIGSEGV: "SIGSEGV",
-                    signal.SIGTERM: "SIGTERM",
-                }
-                failure.signal = signals.get(-status, str(-status))
-
-        return failure
+        exitfail = (
+            status != 0
+            if len(self.checker.exitchecks) == 0
+            else status not in self.checker.exitchecks
+        )
+        if outfail or errfail or exitfail:
+            return TestFailure(outfail, errfail, status, self.checker.exitchecks, self)
 
 
 class CheckCmd(object):
@@ -675,6 +723,27 @@ class Checker(object):
         self.errchecks = [
             CheckCmd.parse(sl, "CHECKERR") for sl in group1s(CHECK_STDERR_RE)
         ]
+        exitchecks = set()
+        for code_line in [sl.text for sl in group1s(CHECK_EXIT_RE)]:
+            for code in code_line.split():
+                try:
+                    # Check for numeric exit code
+                    exitchecks.add(int(code))
+                except ValueError:
+                    # Check for signal name
+                    no_prefix_name = code.lstrip("SIG")
+                    found_signal = False
+                    # TODO: Is there an API for checking if a string corresponds to a signal name?
+                    for sig in signal.Signals:
+                        if sig.name.lstrip("SIG") == no_prefix_name:
+                            exitchecks.add(-sig.value)
+                            found_signal = True
+                            break
+                    if not found_signal:
+                        raise CheckerError(
+                            f"CHECKEXIT line with invalid exit code specification: {code}"
+                        )
+        self.exitchecks = exitchecks
 
 
 def check_file(input_file, name, subs, config, failure_handler, env=None):

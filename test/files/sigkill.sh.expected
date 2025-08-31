@@ -1,0 +1,6 @@
+Failure in sigkill.sh:
+
+  Process was unexpectedly killed by signal SIGKILL (Killed)
+
+  when running command:
+    /bin/sh sigkill.sh

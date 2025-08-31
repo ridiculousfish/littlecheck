@@ -46,8 +46,8 @@ class LittlecheckTest(unittest.TestCase):
     def test_py_missing_output(self):
         self.do_1_path_test("python_missing_output")
 
-    def test_py_multiple_errour_output(self):
-        self.do_1_path_test("python_multipe_error_annotation_lines")
+    def test_py_multiple_error_output(self):
+        self.do_1_path_test("python_multiple_error_annotation_lines")
 
     def test_py_extra_output(self):
         self.do_1_path_test("python_extra_output")
@@ -108,3 +108,24 @@ class LittlecheckTest(unittest.TestCase):
         except littlecheck.CheckerError:
             return
         raise Exception
+
+    def test_sigkill(self):
+        self.do_1_path_test("sigkill.sh")
+
+    def test_sigint(self):
+        self.do_1_path_test("sigint.sh")
+
+    def test_int(self):
+        self.do_1_path_test("int.sh")
+
+    def test_sig2(self):
+        self.do_1_path_test("sig2.sh")
+
+    def test_exit_42(self):
+        self.do_1_path_test("exit_42.sh")
+
+    def test_exit_unexpected_0(self):
+        self.do_1_path_test("exit_unexpected_0.sh")
+
+    def test_exit_unexpected_multiple_expected(self):
+        self.do_1_path_test("exit_unexpected_multiple_expected.sh")

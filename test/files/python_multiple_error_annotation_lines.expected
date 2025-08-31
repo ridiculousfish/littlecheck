@@ -1,4 +1,4 @@
-Failure in python_multipe_error_annotation_lines.py:
+Failure in python_multiple_error_annotation_lines.py:
 
   The CHECK on line 24 wants:
     things should be cool
@@ -6,15 +6,20 @@ Failure in python_multipe_error_annotation_lines.py:
   which failed to match line stdout:2:
     something failed
 
-  additional output on stderr:3:5:
-    stderr3
-    stderr4
-    stderr5
-
   Context:
     fine so far
     something failed <= does not match CHECK on line 24: things should be cool
     now stdout is broken <= no more checks
 
+  There were no remaining checks left to match stderr:3:
+    stderr3
+
+  Context:
+    stderr1
+    stderr2
+    stderr3 <= no more checks
+    stderr4
+    stderr5
+
   when running command:
-    /usr/bin/python3 python_multipe_error_annotation_lines.py
+    /usr/bin/python3 python_multiple_error_annotation_lines.py

@@ -1,0 +1,6 @@
+Failure in exit_unexpected_multiple_expected.sh:
+
+  Process unexpectedly exited with code 0 (expected: -100 or 1 or SIGINT (Interrupt) or SIGKILL (Killed))
+
+  when running command:
+    /bin/sh exit_unexpected_multiple_expected.sh

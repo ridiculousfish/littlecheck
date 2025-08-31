@@ -1,0 +1,6 @@
+Failure in exit_unexpected_0.sh:
+
+  Process unexpectedly exited with code 0 (expected: 1)
+
+  when running command:
+    /bin/sh exit_unexpected_0.sh
