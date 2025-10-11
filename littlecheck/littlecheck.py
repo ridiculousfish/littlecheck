@@ -13,7 +13,6 @@ import re
 import shlex
 import sys
 import unicodedata
-from pathlib import Path
 
 try:
     from itertools import zip_longest
@@ -388,7 +387,7 @@ def runproc(cmd, env=None):
     return asyncio.run(runproc_async(cmd, env=env))
 
 
-async def runproc_async(cmd, env=None, cwd: Path | None = None):
+async def runproc_async(cmd, env=None, cwd=None):
     """Wrapper around subprocess.Popen to save typing"""
     PIPE = asyncio.subprocess.PIPE
     return await asyncio.create_subprocess_shell(
@@ -397,9 +396,7 @@ async def runproc_async(cmd, env=None, cwd: Path | None = None):
 
 
 class TestRun(object):
-    def __init__(
-        self, name, runcmd, checker, subs, config, env=None, cwd: Path | None = None
-    ):
+    def __init__(self, name, runcmd, checker, subs, config, env=None, cwd=None):
         self.name = name
         self.runcmd = runcmd
         self.subbed_command = perform_substitution(runcmd.args, subs)
@@ -689,7 +686,7 @@ def check_file(input_file, name, subs, config, failure_handler, env=None):
 
 
 async def check_file_async(
-    input_file, name, subs, config, failure_handler, env=None, cwd: Path | None = None
+    input_file, name, subs, config, failure_handler, env=None, cwd=None
 ):
     """Check a single file. Return a True on success, False on error."""
     success = True
@@ -729,9 +726,7 @@ def check_path(path, subs, config, failure_handler, env=None):
     return asyncio.run(check_path_async(path, subs, config, failure_handler, env=env))
 
 
-async def check_path_async(
-    path, subs, config, failure_handler, env=None, cwd: Path | None = None
-):
+async def check_path_async(path, subs, config, failure_handler, env=None, cwd=None):
     with io.open(path, encoding="utf-8") as fd:
         return await check_file_async(
             fd, path, subs, config, failure_handler, env=env, cwd=cwd
