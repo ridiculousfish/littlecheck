@@ -108,3 +108,14 @@ class LittlecheckTest(unittest.TestCase):
         except littlecheck.CheckerError:
             return
         raise Exception
+
+    def test_funny_regex(self):
+        try:
+            self.do_1_path_test("funny_regex")
+        except littlecheck.CheckerError as e:
+            self.assertEqual(
+                str(e),
+                r"""Expression ('{{\d{4}}}') is ambiguous, consider using '{{\d{4}}{{[}]}}' if you really mean that"""
+            )
+            return
+        raise Exception
